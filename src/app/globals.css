@@ -3,6 +3,17 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Tema por defecto de la carta digital (fallback si un negocio
+     todavía no tiene colores configurados en Supabase).
+     Cada página los sobreescribe en tiempo real con
+     style={{ '--color-fondo': negocio.color_fondo, ... }} */
+  --color-fondo: #faf5ec;
+  --color-header: #101b2d;
+  --color-acento: #b8863b;
+  --color-acento-soft: #d9b877;
+  --color-texto: #22303f;
+  --color-muted: #6b7280;
 }
 
 @theme inline {
@@ -10,6 +21,15 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Registramos también el tema de la carta como utilidades Tailwind,
+     así puedes usar bg-carta-fondo, text-carta-acento, etc. */
+  --color-carta-fondo: var(--color-fondo);
+  --color-carta-header: var(--color-header);
+  --color-carta-acento: var(--color-acento);
+  --color-carta-acento-soft: var(--color-acento-soft);
+  --color-carta-texto: var(--color-texto);
+  --color-carta-muted: var(--color-muted);
 }
 
 @media (prefers-color-scheme: dark) {
