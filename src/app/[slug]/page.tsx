@@ -22,6 +22,43 @@ type Plato = {
   precio: number
 }
 
+// Marca del faro: icono vectorial propio, no una foto de stock
+function LogoFaro() {
+  return (
+    <svg width="46" height="46" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M27 6 H37 L40 16 H24 L27 6 Z"
+        stroke="#B8863B"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M24 16 L21 52 H43 L40 16 Z"
+        stroke="#B8863B"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <line x1="22.4" y1="27" x2="41.6" y2="27" stroke="#B8863B" strokeWidth="1.4" />
+      <line x1="21.7" y1="38" x2="42.3" y2="38" stroke="#B8863B" strokeWidth="1.4" />
+      <rect x="18" y="52" width="28" height="5" stroke="#B8863B" strokeWidth="1.6" />
+      <path
+        d="M9 22 C13 20 13 24 9 22"
+        stroke="#B8863B"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+      <path d="M6 18 L14 12" stroke="#B8863B" strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M6 26 L14 32" stroke="#B8863B" strokeWidth="1.4" strokeLinecap="round" />
+      <path
+        d="M8 60 C 16 55, 24 65, 32 60 C 40 55, 48 65, 56 60"
+        stroke="#B8863B"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
 export default async function CartaDigital({
   params,
 }: {
@@ -52,7 +89,7 @@ export default async function CartaDigital({
     )
   }
 
-const { data: platos } = await supabase
+  const { data: platos } = await supabase
     .from('platos')
     .select('id, nombre, precio, orden, disponible, categoria:categoría, descripcion:descripción')
     .eq('negocio_id', negocio.id)
@@ -77,27 +114,44 @@ const { data: platos } = await supabase
       style={{ fontFamily: 'var(--font-body)' }}
     >
       {/* Cabecera */}
-      <header className="relative overflow-hidden bg-[#101B2D] px-6 pt-16 pb-14 text-center">
+      <header className="relative overflow-hidden bg-[#101B2D] px-6 pt-14 pb-16">
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              'radial-gradient(60% 50% at 50% 0%, rgba(184,134,59,0.35), transparent 70%)',
+              'radial-gradient(60% 55% at 50% 0%, rgba(184,134,59,0.35), transparent 70%)',
           }}
         />
-        <p className="relative text-[11px] tracking-[0.3em] text-[#B8863B] uppercase mb-3">
-          Carta
-        </p>
-        <h1
-          className="relative text-4xl text-[#FAF5EC] leading-tight"
-          style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}
+        <div className="relative flex flex-col items-center text-center">
+          <LogoFaro />
+          <p className="mt-4 text-[11px] tracking-[0.35em] text-[#B8863B] uppercase">
+            Cocina de costa
+          </p>
+          <h1
+            className="mt-2 text-4xl text-[#FAF5EC] leading-tight"
+            style={{ fontFamily: 'var(--font-display)', fontWeight: 500 }}
+          >
+            {negocio.nombre}
+          </h1>
+          <div className="mt-4 h-px w-10 bg-[#B8863B]/50" />
+        </div>
+
+        {/* Ola decorativa de transición */}
+        <svg
+          className="absolute bottom-[-1px] left-0 w-full"
+          height="28"
+          viewBox="0 0 1440 60"
+          preserveAspectRatio="none"
         >
-          {negocio.nombre}
-        </h1>
+          <path
+            d="M0,30 C240,60 480,0 720,22 C960,44 1200,8 1440,28 L1440,60 L0,60 Z"
+            fill="#FAF5EC"
+          />
+        </svg>
       </header>
 
       {/* Menú */}
-      <main className="mx-auto max-w-md px-6 py-10">
+      <main className="mx-auto max-w-md px-6 pt-6 pb-10">
         {categorias.length === 0 && (
           <p className="text-center text-sm text-[#6B7280]">
             Todavía no hay platos disponibles.
@@ -139,8 +193,19 @@ const { data: platos } = await supabase
         ))}
       </main>
 
-      <footer className="pb-10 pt-4 text-center">
-        <p className="text-[11px] tracking-widest uppercase text-[#22303F]/30">
+      <footer className="relative overflow-hidden bg-[#101B2D] px-6 pt-8 pb-8 text-center">
+        <svg
+          className="absolute top-[-1px] left-0 w-full rotate-180"
+          height="20"
+          viewBox="0 0 1440 60"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M0,30 C240,60 480,0 720,22 C960,44 1200,8 1440,28 L1440,60 L0,60 Z"
+            fill="#FAF5EC"
+          />
+        </svg>
+        <p className="relative text-[11px] tracking-[0.3em] uppercase text-[#B8863B]/70">
           Carta digital
         </p>
       </footer>
