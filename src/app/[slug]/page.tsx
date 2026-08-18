@@ -52,9 +52,9 @@ export default async function CartaDigital({
     )
   }
 
-  const { data: platos } = await supabase
+const { data: platos } = await supabase
     .from('platos')
-    .select('*')
+    .select('id, nombre, precio, orden, disponible, categoria:categoría, descripcion:descripción')
     .eq('negocio_id', negocio.id)
     .eq('disponible', true)
     .order('orden', { ascending: true })
