@@ -61,7 +61,7 @@ const { data: platos } = await supabase
 
   // Agrupar platos por categoría, preservando el orden de aparición
   const categorias: { nombre: string; platos: Plato[] }[] = []
-  ;(platos ?? []).forEach((plato: Plato) => {
+  ;((platos ?? []) as unknown as Plato[]).forEach((plato) => {
     const cat = plato.categoria || 'Otros'
     let grupo = categorias.find((c) => c.nombre === cat)
     if (!grupo) {
