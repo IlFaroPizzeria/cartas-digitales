@@ -7,10 +7,16 @@ type Plato = {
   categoria: string
   categoria_en: string | null
   categoria_de: string | null
+  categoria_it: string | null
+  categoria_sv: string | null
+  categoria_fr: string | null
   nombre: string
   descripcion: string | null
   descripcion_en: string | null
   descripcion_de: string | null
+  descripcion_it: string | null
+  descripcion_sv: string | null
+  descripcion_fr: string | null
   precio: number
 }
 
@@ -24,15 +30,23 @@ type Negocio = {
   color_header: string
   color_acento: string
   logo_url: string | null
+  idiomas_activos: string[] | null
 }
 
-type Lang = 'es' | 'en' | 'de'
+type Lang = 'es' | 'en' | 'de' | 'it' | 'sv' | 'fr'
 
 const UI_TEXT: Record<Lang, { footLabel: string; noPlatos: string }> = {
   es: { footLabel: 'Carta digital', noPlatos: 'Todavía no hay platos disponibles.' },
   en: { footLabel: 'Digital Menu', noPlatos: 'No dishes available yet.' },
   de: { footLabel: 'Digitale Speisekarte', noPlatos: 'Noch keine Gerichte verfügbar.' },
+  it: { footLabel: 'Menù digitale', noPlatos: 'Ancora nessun piatto disponibile.' },
+  sv: { footLabel: 'Digital meny', noPlatos: 'Inga rätter tillgängliga ännu.' },
+  fr: { footLabel: 'Menu digital', noPlatos: 'Aucun plat disponible pour le moment.' },
 }
+
+// Idiomas soportados por la plataforma, en el orden en que se muestran
+// si el negocio los tiene activos (negocio.idiomas_activos)
+const ALL_LANGS: Lang[] = ['es', 'en', 'de', 'it', 'sv', 'fr']
 
 // Marca genérica de respaldo (faro) para negocios sin logo_url propio
 function LogoFaro({ color }: { color: string }) {
@@ -58,22 +72,46 @@ export default function CartaClient({
   negocio: Negocio
   platos: Plato[]
 }) {
-  const [lang, setLang] = useState<Lang>('es')
+  // Idiomas realmente activos para este negocio (lo que ha contratado).
+  // Si el campo viene vacío por lo que sea, cae en español solo.
+  const idiomasActivos: Lang[] =
+    negocio.idiomas_activos && negocio.idiomas_activos.length > 0
+      ? (negocio.idiomas_activos.filter((l) => ALL_LANGS.includes(l as Lang)) as Lang[])
+      : ['es']
+
+  const [lang, setLang] = useState<Lang>(idiomasActivos[0] || 'es')
 
   const colorFondo = negocio.color_fondo || '#faf5ec'
   const colorHeader = negocio.color_header || '#101b2d'
   const colorAcento = negocio.color_acento || '#b8863b'
   const tagline = negocio.tagline || 'Carta digital'
 
+  const CATEGORIA_POR_IDIOMA: Record<Lang, keyof Plato | null> = {
+    es: null, // usa 'categoria' directamente
+    en: 'categoria_en',
+    de: 'categoria_de',
+    it: 'categoria_it',
+    sv: 'categoria_sv',
+    fr: 'categoria_fr',
+  }
+  const DESCRIPCION_POR_IDIOMA: Record<Lang, keyof Plato | null> = {
+    es: null,
+    en: 'descripcion_en',
+    de: 'descripcion_de',
+    it: 'descripcion_it',
+    sv: 'descripcion_sv',
+    fr: 'descripcion_fr',
+  }
+
   function categoriaTexto(p: Plato) {
-    if (lang === 'en') return p.categoria_en || p.categoria
-    if (lang === 'de') return p.categoria_de || p.categoria
-    return p.categoria
+    const key = CATEGORIA_POR_IDIOMA[lang]
+    if (!key) return p.categoria
+    return (p[key] as string | null) || p.categoria
   }
   function descripcionTexto(p: Plato) {
-    if (lang === 'en') return p.descripcion_en || p.descripcion
-    if (lang === 'de') return p.descripcion_de || p.descripcion
-    return p.descripcion
+    const key = DESCRIPCION_POR_IDIOMA[lang]
+    if (!key) return p.descripcion
+    return (p[key] as string | null) || p.descripcion
   }
 
   // Agrupar por categoría (en el idioma activo), preservando el orden de aparición
@@ -104,28 +142,30 @@ export default function CartaClient({
           }}
         />
 
-        {/* Selector de idioma */}
-        <div className="relative flex justify-center mb-6">
-          <div
-            className="inline-flex gap-0.5 rounded-full p-1 border"
-            style={{ backgroundColor: '#00000030', borderColor: `${colorAcento}59` }}
-          >
-            {(['es', 'en', 'de'] as Lang[]).map((l) => (
-              <button
-                key={l}
-                onClick={() => setLang(l)}
-                className="px-3.5 py-1.5 rounded-full text-[11px] font-semibold tracking-wide transition-colors"
-                style={
-                  lang === l
-                    ? { backgroundColor: colorAcento, color: colorHeader }
-                    : { color: `${colorAcento}CC` }
-                }
-              >
-                {l.toUpperCase()}
-              </button>
-            ))}
+        {/* Selector de idioma: solo se muestra si el negocio tiene más de 1 activo */}
+        {idiomasActivos.length > 1 && (
+          <div className="relative flex justify-center mb-6">
+            <div
+              className="inline-flex gap-0.5 rounded-full p-1 border"
+              style={{ backgroundColor: '#00000030', borderColor: `${colorAcento}59` }}
+            >
+              {idiomasActivos.map((l) => (
+                <button
+                  key={l}
+                  onClick={() => setLang(l)}
+                  className="px-3.5 py-1.5 rounded-full text-[11px] font-semibold tracking-wide transition-colors"
+                  style={
+                    lang === l
+                      ? { backgroundColor: colorAcento, color: colorHeader }
+                      : { color: `${colorAcento}CC` }
+                  }
+                >
+                  {l.toUpperCase()}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="relative flex flex-col items-center text-center">
           {negocio.logo_url ? (

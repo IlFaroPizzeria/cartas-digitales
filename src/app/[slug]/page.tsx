@@ -55,8 +55,8 @@ export default async function CartaDigital({
     .from('platos')
     .select(
       'id, nombre, precio, orden, disponible, ' +
-      'categoria:categoría, categoria_en, categoria_de, ' +
-      'descripcion:descripción, descripcion_en, descripcion_de'
+      'categoria:categoría, categoria_en, categoria_de, categoria_it, categoria_sv, categoria_fr, ' +
+      'descripcion:descripción, descripcion_en, descripcion_de, descripcion_it, descripcion_sv, descripcion_fr'
     )
     .eq('negocio_id', negocio.id)
     .eq('disponible', true)
@@ -75,6 +75,7 @@ export default async function CartaDigital({
           color_header: negocio.color_header || '#101b2d',
           color_acento: negocio.color_acento || '#b8863b',
           logo_url: negocio.logo_url,
+          idiomas_activos: negocio.idiomas_activos,
         }}
         platos={(platos ?? []) as never}
       />
