@@ -3,12 +3,14 @@
 import Link from 'next/link'
 import { useState, useTransition } from 'react'
 import { toggleDisponible, deletePlato, movePlato } from './actions'
+import { etiquetaPorId } from '@/lib/etiquetas'
 
 type Plato = {
   id: number
   nombre: string
   precio: number
   disponible: boolean
+  etiquetas: string[] | null
 }
 
 export default function PlatoRow({
@@ -65,6 +67,19 @@ export default function PlatoRow({
         <div className="min-w-0 mr-auto">
           <p className="text-[15px] font-medium text-slate-900 truncate">{plato.nombre}</p>
           <p className="text-sm text-slate-600 tabular-nums">{Number(plato.precio).toFixed(2)} €</p>
+          {plato.etiquetas && plato.etiquetas.length > 0 && (
+            <div className="mt-1 flex flex-wrap gap-1">
+              {plato.etiquetas.map((id) => {
+                const etiqueta = etiquetaPorId(id)
+                if (!etiqueta) return null
+                return (
+                  <span key={id} title={etiqueta.label.es} className="text-xs">
+                    {etiqueta.emoji}
+                  </span>
+                )
+              })}
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
           <div className="flex rounded-md border border-slate-200 overflow-hidden">

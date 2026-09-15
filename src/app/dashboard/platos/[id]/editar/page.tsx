@@ -9,6 +9,7 @@ type PlatoRow = {
   negocio_id: number
   descripcion: string | null
   categoria: string | null
+  etiquetas: string[] | null
 }
 
 export default async function EditarPlatoPage({
@@ -37,7 +38,7 @@ export default async function EditarPlatoPage({
   // castea explícitamente, tal y como ya hace src/app/[slug]/page.tsx.
   const { data: platoRaw } = await supabase
     .from('platos')
-    .select('id, nombre, precio, negocio_id, descripcion:descripción, categoria:categoría')
+    .select('id, nombre, precio, negocio_id, descripcion:descripción, categoria:categoría, etiquetas')
     .eq('id', id)
     .single()
 
@@ -55,6 +56,7 @@ export default async function EditarPlatoPage({
           descripcion: plato.descripcion,
           precio: plato.precio,
           categoria: plato.categoria ?? '',
+          etiquetas: plato.etiquetas ?? [],
         }}
       />
     </div>

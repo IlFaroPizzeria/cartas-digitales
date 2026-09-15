@@ -31,6 +31,7 @@ type PlatoConCategoriaRaw = {
   descripcion_it: string | null
   descripcion_sv: string | null
   descripcion_fr: string | null
+  etiquetas: string[] | null
   categorias: {
     nombre: string
     nombre_en: string | null
@@ -87,7 +88,7 @@ export default async function CartaDigital({
     .from('platos')
     .select(
       'id, nombre, precio, orden, disponible, ' +
-      'descripcion:descripción, descripcion_en, descripcion_de, descripcion_it, descripcion_sv, descripcion_fr, ' +
+      'descripcion:descripción, descripcion_en, descripcion_de, descripcion_it, descripcion_sv, descripcion_fr, etiquetas, ' +
       'categorias ( nombre, nombre_en, nombre_de, nombre_it, nombre_sv, nombre_fr, orden )'
     )
     .eq('negocio_id', negocio.id)
@@ -111,6 +112,7 @@ export default async function CartaDigital({
     descripcion_it: p.descripcion_it,
     descripcion_sv: p.descripcion_sv,
     descripcion_fr: p.descripcion_fr,
+    etiquetas: p.etiquetas ?? [],
   }))
 
   return (

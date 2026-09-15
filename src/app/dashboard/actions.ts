@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { etiquetasValidas } from '@/lib/etiquetas'
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>
 
@@ -76,6 +77,8 @@ export async function savePlato(formData: FormData) {
   const precio = Number(formData.get('precio'))
   const categoriaNombre = String(formData.get('categoria') ?? '').trim()
 
+  const etiquetas = etiquetasValidas(formData.getAll('etiquetas').map(String))
+
   if (!nombre) throw new Error('El nombre es obligatorio')
   if (!Number.isFinite(precio) || precio < 0) throw new Error('El precio no es válido')
   if (!categoriaNombre) throw new Error('La categoría es obligatoria')
@@ -91,6 +94,7 @@ export async function savePlato(formData: FormData) {
         precio,
         categoria_id: categoriaId,
         categoría: categoriaNombre,
+        etiquetas,
       })
       .eq('id', id)
     if (error) throw new Error('No se pudo guardar el plato')
@@ -102,6 +106,7 @@ export async function savePlato(formData: FormData) {
       precio,
       categoria_id: categoriaId,
       categoría: categoriaNombre,
+      etiquetas,
       disponible: true,
       orden: 999,
     })

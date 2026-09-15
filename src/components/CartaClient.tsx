@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { etiquetaPorId } from '@/lib/etiquetas'
 
 type Plato = {
   id: number
@@ -17,6 +18,7 @@ type Plato = {
   descripcion_it: string | null
   descripcion_sv: string | null
   descripcion_fr: string | null
+  etiquetas: string[]
   precio: number
 }
 
@@ -242,6 +244,24 @@ export default function CartaClient({
                     <p className="mt-1 text-[13px] leading-relaxed text-[#6B7280]">
                       {descripcionTexto(plato)}
                     </p>
+                  )}
+                  {plato.etiquetas.length > 0 && (
+                    <div className="mt-1.5 flex flex-wrap gap-1">
+                      {plato.etiquetas.map((id) => {
+                        const etiqueta = etiquetaPorId(id)
+                        if (!etiqueta) return null
+                        return (
+                          <span
+                            key={id}
+                            className="inline-flex items-center gap-1 text-[10.5px] px-1.5 py-0.5 rounded-full"
+                            style={{ backgroundColor: `${colorHeader}0D`, color: `${colorHeader}B3` }}
+                          >
+                            <span>{etiqueta.emoji}</span>
+                            {etiqueta.label[lang]}
+                          </span>
+                        )
+                      })}
+                    </div>
                   )}
                 </li>
               ))}

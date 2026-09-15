@@ -9,6 +9,7 @@ type PlatoConCategoria = {
   disponible: boolean
   orden: number
   categoria_id: number | null
+  etiquetas: string[] | null
   categorias: { nombre: string; orden: number } | null
 }
 
@@ -38,7 +39,7 @@ export default async function DashboardPage() {
 
   const { data: platos } = await supabase
     .from('platos')
-    .select('id, nombre, precio, disponible, orden, categoria_id, categorias ( nombre, orden )')
+    .select('id, nombre, precio, disponible, orden, categoria_id, etiquetas, categorias ( nombre, orden )')
     .eq('negocio_id', negocio.id)
     .order('orden', { ascending: true })
     .order('id', { ascending: true })
