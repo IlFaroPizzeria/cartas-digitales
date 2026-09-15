@@ -10,7 +10,13 @@ const LINKS = [
   { href: '/dashboard/configuracion', label: 'Configuración' },
 ]
 
-export default function Nav({ nombreNegocio }: { nombreNegocio: string }) {
+export default function Nav({
+  nombreNegocio,
+  isAdmin,
+}: {
+  nombreNegocio: string
+  isAdmin: boolean
+}) {
   const pathname = usePathname()
 
   return (
@@ -23,7 +29,17 @@ export default function Nav({ nombreNegocio }: { nombreNegocio: string }) {
             </span>
             <span className="text-sm font-semibold text-slate-900 truncate">{nombreNegocio}</span>
           </div>
-          <LogoutButton compact />
+          <div className="flex items-center gap-4 shrink-0">
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="text-sm font-medium text-slate-500 hover:text-slate-900"
+              >
+                Panel admin
+              </Link>
+            )}
+            <LogoutButton compact />
+          </div>
         </div>
         <nav className="flex gap-5 -mb-px overflow-x-auto">
           {LINKS.map((link) => {
