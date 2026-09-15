@@ -60,50 +60,55 @@ export default function PlatoRow({
   }
 
   return (
-    <li className={`py-3 ${deleting ? 'opacity-40 pointer-events-none' : ''}`}>
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-sm font-medium text-zinc-900 truncate">{plato.nombre}</p>
-          <p className="text-sm text-zinc-500">{Number(plato.precio).toFixed(2)} €</p>
+    <li className={`py-3.5 ${deleting ? 'opacity-40 pointer-events-none' : ''}`}>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="min-w-0 mr-auto">
+          <p className="text-[15px] font-medium text-slate-900 truncate">{plato.nombre}</p>
+          <p className="text-sm text-slate-600 tabular-nums">{Number(plato.precio).toFixed(2)} €</p>
         </div>
-        <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-          <button
-            onClick={() => handleMove('arriba')}
-            disabled={esPrimera || pending}
-            className="text-xs px-2 py-1 rounded border border-zinc-200 text-zinc-600 disabled:opacity-30"
-            aria-label="Subir"
-          >
-            ↑
-          </button>
-          <button
-            onClick={() => handleMove('abajo')}
-            disabled={esUltima || pending}
-            className="text-xs px-2 py-1 rounded border border-zinc-200 text-zinc-600 disabled:opacity-30"
-            aria-label="Bajar"
-          >
-            ↓
-          </button>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex rounded-md border border-slate-200 overflow-hidden">
+            <button
+              onClick={() => handleMove('arriba')}
+              disabled={esPrimera || pending}
+              className="px-1.5 py-1 text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent border-r border-slate-200"
+              aria-label="Subir"
+            >
+              ↑
+            </button>
+            <button
+              onClick={() => handleMove('abajo')}
+              disabled={esUltima || pending}
+              className="px-1.5 py-1 text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent"
+              aria-label="Bajar"
+            >
+              ↓
+            </button>
+          </div>
           <button
             onClick={handleToggle}
             disabled={pending}
-            className={`text-xs font-medium px-2.5 py-1.5 rounded-full border whitespace-nowrap ${
+            className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-full border whitespace-nowrap ${
               disponible
-                ? 'bg-green-50 text-green-700 border-green-200'
-                : 'bg-zinc-100 text-zinc-500 border-zinc-200'
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                : 'bg-slate-100 text-slate-600 border-slate-300'
             }`}
           >
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${disponible ? 'bg-emerald-500' : 'bg-slate-400'}`}
+            />
             {disponible ? 'Disponible' : 'No disponible'}
           </button>
           <Link
             href={`/dashboard/platos/${plato.id}/editar`}
-            className="text-xs font-medium px-2.5 py-1.5 rounded-full border border-zinc-200 text-zinc-700"
+            className="text-xs font-semibold px-2.5 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:bg-slate-50"
           >
             Editar
           </Link>
           <button
             onClick={handleDelete}
             disabled={pending}
-            className="text-xs font-medium px-2.5 py-1.5 rounded-full border border-red-200 text-red-600"
+            className="text-xs font-semibold px-2.5 py-1.5 rounded-full border border-red-200 text-red-700 hover:bg-red-50"
           >
             Eliminar
           </button>

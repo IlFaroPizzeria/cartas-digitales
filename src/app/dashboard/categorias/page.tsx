@@ -17,8 +17,8 @@ export default async function CategoriasPage() {
 
   if (!negocio) {
     return (
-      <div className="max-w-md mx-auto bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 text-center">
-        <p className="text-sm text-amber-600">
+      <div className="max-w-md mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center">
+        <p className="text-sm text-amber-700">
           Tu usuario todavía no está enlazado a ningún restaurante.
         </p>
       </div>
@@ -32,14 +32,17 @@ export default async function CategoriasPage() {
     .order('orden', { ascending: true })
 
   return (
-    <div className="max-w-md mx-auto space-y-6">
-      <h1 className="text-lg font-semibold text-zinc-900">Categorías</h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-xl font-semibold text-slate-900">Categorías</h1>
+        <p className="text-sm text-slate-500">Organiza y ordena las secciones de tu carta</p>
+      </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-4">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
         {(!categorias || categorias.length === 0) && (
-          <p className="text-sm text-zinc-500 mb-2">Todavía no tienes categorías.</p>
+          <p className="text-sm text-slate-500 mb-2">Todavía no tienes categorías.</p>
         )}
-        <ul className="divide-y divide-zinc-100">
+        <ul className="divide-y divide-slate-100">
           {(categorias ?? []).map((categoria, i) => (
             <CategoriaRow
               key={categoria.id}
@@ -51,8 +54,8 @@ export default async function CategoriasPage() {
         </ul>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-4">
-        <h2 className="text-sm font-medium text-zinc-900 mb-3">Nueva categoría</h2>
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <h2 className="text-sm font-semibold text-slate-900 mb-3">Nueva categoría</h2>
         <NuevaCategoriaForm />
       </div>
     </div>

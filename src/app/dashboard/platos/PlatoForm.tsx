@@ -35,33 +35,31 @@ export default function PlatoForm({ plato }: Props) {
     }
   }
 
+  const inputClass =
+    'w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+
   return (
     <form action={handleSubmit} className="space-y-4">
       {plato && <input type="hidden" name="id" value={plato.id} />}
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 mb-1">Nombre</label>
-        <input
-          name="nombre"
-          required
-          defaultValue={plato?.nombre}
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-zinc-900"
-        />
+        <label className="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
+        <input name="nombre" required defaultValue={plato?.nombre} className={inputClass} />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 mb-1">Categoría</label>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Categoría</label>
         <input
           name="categoria"
           required
           defaultValue={plato?.categoria}
           placeholder="Ej: Entrantes"
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-zinc-900"
+          className={inputClass}
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 mb-1">Precio (€)</label>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Precio (€)</label>
         <input
           name="precio"
           type="number"
@@ -70,35 +68,39 @@ export default function PlatoForm({ plato }: Props) {
           inputMode="decimal"
           required
           defaultValue={plato?.precio}
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-zinc-900"
+          className={inputClass}
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-700 mb-1">Descripción (opcional)</label>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Descripción (opcional)</label>
         <textarea
           name="descripcion"
           rows={3}
           defaultValue={plato?.descripcion ?? ''}
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-zinc-900"
+          className={inputClass}
         />
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      {saved && <p className="text-sm text-green-600">Plato guardado correctamente.</p>}
+      {error && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+          {error}
+        </p>
+      )}
+      {saved && <p className="text-sm text-emerald-700">Plato guardado correctamente.</p>}
 
-      <div className="flex gap-3">
+      <div className="flex gap-3 pt-1">
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 rounded-lg bg-zinc-900 text-white py-3 text-base font-medium disabled:opacity-50"
+          className="flex-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white py-3 text-base font-medium shadow-sm transition-colors disabled:opacity-50"
         >
           {loading ? 'Guardando...' : 'Guardar'}
         </button>
         <button
           type="button"
           onClick={() => router.push('/dashboard')}
-          className="rounded-lg border border-zinc-300 px-4 py-3 text-base font-medium text-zinc-700"
+          className="rounded-lg border border-slate-300 px-4 py-3 text-base font-medium text-slate-700 hover:bg-slate-50"
         >
           Cancelar
         </button>

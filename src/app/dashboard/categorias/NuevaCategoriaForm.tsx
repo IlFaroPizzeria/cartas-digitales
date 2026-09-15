@@ -31,12 +31,12 @@ export default function NuevaCategoriaForm() {
           name="nombre"
           required
           placeholder="Ej: Postres"
-          className="flex-1 rounded-lg border border-zinc-300 px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-zinc-900"
+          className="flex-1 rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
         />
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-zinc-900 text-white px-4 py-2.5 text-sm font-medium disabled:opacity-50"
+          className="rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 text-sm font-medium shadow-sm transition-colors disabled:opacity-50"
         >
           {loading ? 'Creando...' : 'Crear'}
         </button>
