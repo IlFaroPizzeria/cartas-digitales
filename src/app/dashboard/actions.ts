@@ -110,3 +110,89 @@ export async function savePlato(formData: FormData) {
 
   revalidatePath('/dashboard')
 }
+
+export async function createCategoria(formData: FormData) {
+  const supabase = await createClient()
+  const negocioId = await getOwnedNegocioId(supabase)
+  const nombre = String(formData.get('nombre') ?? '').trim()
+  if (!nombre) throw new Error('El nombre es obligatorio')
+
+  const { data: maxOrden } = await supabase
+    .from('categorias')
+    .select('orden')
+    .eq('negocio_id', negocioId)
+    .order('orden', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const siguienteOrden = (maxOrden?.orden ?? 0) + 1
+
+  const { error } = await supabase
+    .from('categorias')
+    .insert({ negocio_id: negocioId, nombre, orden: siguienteOrden })
+  if (error) throw new Error('No se pudo crear la categoría')
+
+  revalidatePath('/dashboard/categorias')
+}
+
+export async function renameCategoria(categoriaId: number, nombre: string) {
+  const supabase = await createClient()
+  await getOwnedNegocioId(supabase)
+  const nombreLimpio = nombre.trim()
+  if (!nombreLimpio) throw new Error('El nombre es obligatorio')
+
+  const { error } = await supabase
+    .from('categorias')
+    .update({ nombre: nombreLimpio })
+    .eq('id', categoriaId)
+  if (error) throw new Error('No se pudo renombrar la categoría')
+
+  revalidatePath('/dashboard/categorias')
+  revalidatePath('/dashboard')
+}
+
+export async function deleteCategoria(categoriaId: number) {
+  const supabase = await createClient()
+  await getOwnedNegocioId(supabase)
+
+  const { count } = await supabase
+    .from('platos')
+    .select('id', { count: 'exact', head: true })
+    .eq('categoria_id', categoriaId)
+
+  if (count && count > 0) {
+    throw new Error('Esta categoría tiene platos. Muévelos o bórralos antes de eliminarla.')
+  }
+
+  const { error } = await supabase.from('categorias').delete().eq('id', categoriaId)
+  if (error) throw new Error('No se pudo eliminar la categoría')
+
+  revalidatePath('/dashboard/categorias')
+}
+
+export async function moveCategoria(categoriaId: number, direccion: 'arriba' | 'abajo') {
+  const supabase = await createClient()
+  const negocioId = await getOwnedNegocioId(supabase)
+
+  const { data: categorias } = await supabase
+    .from('categorias')
+    .select('id, orden')
+    .eq('negocio_id', negocioId)
+    .order('orden', { ascending: true })
+
+  if (!categorias) return
+  const index = categorias.findIndex((c) => c.id === categoriaId)
+  if (index === -1) return
+
+  const otroIndex = direccion === 'arriba' ? index - 1 : index + 1
+  if (otroIndex < 0 || otroIndex >= categorias.length) return
+
+  const actual = categorias[index]
+  const otro = categorias[otroIndex]
+
+  await supabase.from('categorias').update({ orden: otro.orden }).eq('id', actual.id)
+  await supabase.from('categorias').update({ orden: actual.orden }).eq('id', otro.id)
+
+  revalidatePath('/dashboard/categorias')
+  revalidatePath('/dashboard')
+}
