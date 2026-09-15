@@ -41,6 +41,7 @@ export default async function DashboardPage() {
     .select('id, nombre, precio, disponible, orden, categoria_id, categorias ( nombre, orden )')
     .eq('negocio_id', negocio.id)
     .order('orden', { ascending: true })
+    .order('id', { ascending: true })
 
   const grupos: { nombre: string; orden: number; platos: PlatoConCategoria[] }[] = []
   for (const p of (platos ?? []) as unknown as PlatoConCategoria[]) {
@@ -85,8 +86,13 @@ export default async function DashboardPage() {
             {grupo.nombre}
           </h2>
           <ul className="divide-y divide-zinc-100">
-            {grupo.platos.map((plato) => (
-              <PlatoRow key={plato.id} plato={plato} />
+            {grupo.platos.map((plato, i) => (
+              <PlatoRow
+                key={plato.id}
+                plato={plato}
+                esPrimera={i === 0}
+                esUltima={i === grupo.platos.length - 1}
+              />
             ))}
           </ul>
         </div>

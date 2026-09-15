@@ -196,3 +196,42 @@ export async function moveCategoria(categoriaId: number, direccion: 'arriba' | '
   revalidatePath('/dashboard/categorias')
   revalidatePath('/dashboard')
 }
+
+export async function movePlato(platoId: number, direccion: 'arriba' | 'abajo') {
+  const supabase = await createClient()
+  const negocioId = await getOwnedNegocioId(supabase)
+
+  const { data: plato } = await supabase
+    .from('platos')
+    .select('id, categoria_id')
+    .eq('id', platoId)
+    .single()
+
+  if (!plato) return
+
+  // El orden solo tiene sentido dentro de la misma categoría (es como
+  // se agrupan y muestran los platos tanto en el dashboard como en la
+  // carta pública).
+  const { data: platos } = await supabase
+    .from('platos')
+    .select('id, orden')
+    .eq('negocio_id', negocioId)
+    .eq('categoria_id', plato.categoria_id)
+    .order('orden', { ascending: true })
+    .order('id', { ascending: true })
+
+  if (!platos) return
+  const index = platos.findIndex((p) => p.id === platoId)
+  if (index === -1) return
+
+  const otroIndex = direccion === 'arriba' ? index - 1 : index + 1
+  if (otroIndex < 0 || otroIndex >= platos.length) return
+
+  const actual = platos[index]
+  const otro = platos[otroIndex]
+
+  await supabase.from('platos').update({ orden: otro.orden }).eq('id', actual.id)
+  await supabase.from('platos').update({ orden: actual.orden }).eq('id', otro.id)
+
+  revalidatePath('/dashboard')
+}
