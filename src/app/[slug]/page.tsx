@@ -15,6 +15,33 @@ const publicSans = Public_Sans({
   variable: '--font-body',
 })
 
+// Forma "cruda" que devuelve Supabase: el plato con su categoría
+// embebida (vía categoria_id -> categorias). El tipado de PostgREST no
+// soporta bien los alias con tilde ("descripción"), igual que ya pasaba
+// antes con las columnas de texto: se castea explícitamente.
+type PlatoConCategoriaRaw = {
+  id: number
+  nombre: string
+  precio: number
+  orden: number
+  disponible: boolean
+  descripcion: string | null
+  descripcion_en: string | null
+  descripcion_de: string | null
+  descripcion_it: string | null
+  descripcion_sv: string | null
+  descripcion_fr: string | null
+  categorias: {
+    nombre: string
+    nombre_en: string | null
+    nombre_de: string | null
+    nombre_it: string | null
+    nombre_sv: string | null
+    nombre_fr: string | null
+    orden: number
+  } | null
+}
+
 export default async function CartaDigital({
   params,
 }: {
@@ -51,16 +78,40 @@ export default async function CartaDigital({
     )
   }
 
-  const { data: platos } = await supabase
+  // Los platos ahora se agrupan/ordenan a través de la tabla categorias
+  // (orden de categoría primero, orden de plato después), en vez de las
+  // columnas de texto antiguas. CartaClient no cambia: seguimos
+  // entregándole exactamente la misma forma de datos que antes
+  // (categoria, categoria_en, ..., descripcion, descripcion_en, ...).
+  const { data: platosRaw } = await supabase
     .from('platos')
     .select(
       'id, nombre, precio, orden, disponible, ' +
-      'categoria:categoría, categoria_en, categoria_de, categoria_it, categoria_sv, categoria_fr, ' +
-      'descripcion:descripción, descripcion_en, descripcion_de, descripcion_it, descripcion_sv, descripcion_fr'
+      'descripcion:descripción, descripcion_en, descripcion_de, descripcion_it, descripcion_sv, descripcion_fr, ' +
+      'categorias ( nombre, nombre_en, nombre_de, nombre_it, nombre_sv, nombre_fr, orden )'
     )
     .eq('negocio_id', negocio.id)
     .eq('disponible', true)
+    .order('orden', { ascending: true, foreignTable: 'categorias' })
     .order('orden', { ascending: true })
+
+  const platos = ((platosRaw ?? []) as unknown as PlatoConCategoriaRaw[]).map((p) => ({
+    id: p.id,
+    nombre: p.nombre,
+    precio: p.precio,
+    categoria: p.categorias?.nombre ?? 'Otros',
+    categoria_en: p.categorias?.nombre_en ?? null,
+    categoria_de: p.categorias?.nombre_de ?? null,
+    categoria_it: p.categorias?.nombre_it ?? null,
+    categoria_sv: p.categorias?.nombre_sv ?? null,
+    categoria_fr: p.categorias?.nombre_fr ?? null,
+    descripcion: p.descripcion,
+    descripcion_en: p.descripcion_en,
+    descripcion_de: p.descripcion_de,
+    descripcion_it: p.descripcion_it,
+    descripcion_sv: p.descripcion_sv,
+    descripcion_fr: p.descripcion_fr,
+  }))
 
   return (
     <div className={`${fraunces.variable} ${publicSans.variable}`} style={{ fontFamily: 'var(--font-body)' }}>
@@ -77,7 +128,7 @@ export default async function CartaDigital({
           logo_url: negocio.logo_url,
           idiomas_activos: negocio.idiomas_activos,
         }}
-        platos={(platos ?? []) as never}
+        platos={platos as never}
       />
     </div>
   )
