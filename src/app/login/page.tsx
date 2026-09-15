@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
@@ -84,6 +85,13 @@ export default function LoginPage() {
           >
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
+
+          <p className="mt-4 text-center text-sm text-slate-500">
+            ¿Tienes un restaurante?{' '}
+            <Link href="/registro" className="text-indigo-600 font-medium hover:underline">
+              Crea tu carta digital
+            </Link>
+          </p>
         </form>
       </div>
     </div>

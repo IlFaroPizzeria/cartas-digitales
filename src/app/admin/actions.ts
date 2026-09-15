@@ -55,6 +55,13 @@ export async function createRestaurante(formData: FormData) {
   revalidatePath('/admin')
 }
 
+export async function activarRestaurante(id: number) {
+  const supabase = await requireAdmin()
+  const { error } = await supabase.from('negocios').update({ activo: true }).eq('id', id)
+  if (error) throw new Error('No se pudo activar el restaurante')
+  revalidatePath('/admin')
+}
+
 export async function updateRestaurante(formData: FormData) {
   const supabase = await requireAdmin()
 

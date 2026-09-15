@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { activarRestaurante } from './actions'
 
 export default async function AdminPage() {
   const supabase = await createClient()
@@ -36,10 +37,12 @@ export default async function AdminPage() {
                 className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
                   n.activo
                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : n.owner_id
+                    ? 'bg-amber-50 text-amber-700 border-amber-200'
                     : 'bg-slate-100 text-slate-600 border-slate-300'
                 }`}
               >
-                {n.activo ? 'Activo' : 'Inactivo'}
+                {n.activo ? 'Activo' : n.owner_id ? 'Pendiente' : 'Inactivo'}
               </span>
               <span
                 className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
@@ -54,6 +57,16 @@ export default async function AdminPage() {
                 <span className="text-xs font-medium px-2.5 py-1 rounded-full border border-slate-200 text-slate-600">
                   {n.plan}
                 </span>
+              )}
+              {!n.activo && n.owner_id && (
+                <form action={activarRestaurante.bind(null, n.id)}>
+                  <button
+                    type="submit"
+                    className="text-xs font-semibold px-2.5 py-1.5 rounded-full border border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                  >
+                    Activar
+                  </button>
+                </form>
               )}
               <Link
                 href={`/admin/restaurantes/${n.id}/editar`}

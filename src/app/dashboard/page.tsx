@@ -28,10 +28,13 @@ export default async function DashboardPage() {
     .single()
 
   if (!negocio) {
+    const pendiente = Boolean(user.user_metadata?.negocio_nombre)
     return (
       <div className="max-w-md mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center">
         <p className="text-sm text-amber-700">
-          Tu usuario todavía no está enlazado a ningún restaurante. Contacta con el administrador.
+          {pendiente
+            ? 'Estamos terminando de crear tu restaurante. Recarga la página en unos segundos.'
+            : 'Tu usuario todavía no está enlazado a ningún restaurante. Contacta con el administrador.'}
         </p>
       </div>
     )
