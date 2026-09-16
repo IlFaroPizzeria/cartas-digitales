@@ -1,6 +1,7 @@
 import LandingNav from "@/components/landing/LandingNav";
 import LandingFooter from "@/components/landing/LandingFooter";
 import LandingScript from "@/components/landing/LandingScript";
+import CookieBanner from "@/components/landing/CookieBanner";
 import "../landing.css";
 
 export default function MarketingLayout({
@@ -24,6 +25,7 @@ export default function MarketingLayout({
         <LandingNav />
         {children}
         <LandingFooter />
+        <CookieBanner />
       </div>
       <LandingScript />
     </>

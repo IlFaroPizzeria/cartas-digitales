@@ -30,11 +30,13 @@ export default function LandingFooter() {
             <Link href="/contacto">Solicitar presupuesto</Link>
             <a href="mailto:hola@cartoca.es">hola@cartoca.es</a>
             <Link href="/preguntas">Preguntas frecuentes</Link>
+            <Link href="/quienes-somos">Quiénes somos</Link>
           </div>
         </div>
       </div>
       <div className="wrap foot-bottom">
         <span>© {new Date().getFullYear()} Cartoca</span>
+        <Link href="/privacidad">Política de privacidad</Link>
         <span>Hecho para restaurantes que no quieren volver a imprimir una carta</span>
       </div>
     </footer>
