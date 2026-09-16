@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import ActivarButton from "./ActivarButton";
+import EliminarRestauranteButton from "./EliminarRestauranteButton";
 
 export default async function AdminPage() {
   const supabase = await createClient();
@@ -74,6 +75,11 @@ export default async function AdminPage() {
               >
                 Editar
               </Link>
+              <EliminarRestauranteButton
+                id={n.id}
+                nombre={n.nombre}
+                slug={n.slug}
+              />
             </div>
           </div>
         ))}
