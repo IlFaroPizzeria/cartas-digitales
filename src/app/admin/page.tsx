@@ -78,6 +78,12 @@ export default async function AdminPage() {
               >
                 Editar
               </Link>
+              <Link
+                href={`/admin/restaurantes/${n.id}/carta`}
+                className="text-xs font-semibold px-2.5 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:bg-slate-50"
+              >
+                Carta
+              </Link>
               <EliminarRestauranteButton
                 id={n.id}
                 nombre={n.nombre}

@@ -11,10 +11,16 @@ export default function CategoriaRow({
   categoria,
   esPrimera,
   esUltima,
+  deleteAction = deleteCategoria,
+  moveAction = moveCategoria,
 }: {
   categoria: Categoria;
   esPrimera: boolean;
   esUltima: boolean;
+  // El panel admin pasa aquí sus propias acciones (admin/carta-actions.ts)
+  // para poder editar la carta de cualquier restaurante -- ver PlatoRow.
+  deleteAction?: (categoriaId: number) => Promise<void>;
+  moveAction?: (categoriaId: number, direccion: "arriba" | "abajo") => Promise<void>;
 }) {
   const [confirmando, setConfirmando] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -24,7 +30,7 @@ export default function CategoriaRow({
     setConfirmando(false);
     startTransition(async () => {
       try {
-        await deleteCategoria(categoria.id);
+        await deleteAction(categoria.id);
         toast.success(`Categoría "${categoria.nombre}" eliminada.`);
       } catch (e) {
         toast.error(
@@ -36,7 +42,7 @@ export default function CategoriaRow({
 
   function mover(direccion: "arriba" | "abajo") {
     startTransition(async () => {
-      await moveCategoria(categoria.id, direccion);
+      await moveAction(categoria.id, direccion);
     });
   }
 

@@ -10,6 +10,13 @@ import { useToast } from "@/components/ui/ToastProvider";
 
 type Props = {
   categorias: { id: number; nombre: string }[];
+  // El panel admin pasa aquí su propia acción (admin/carta-actions.ts,
+  // ya ligada al negocio_id correcto con .bind) y la ruta a la que
+  // volver, para poder editar la carta de cualquier restaurante -- ver
+  // PlatoRow/CategoriaRow para el mismo patrón.
+  saveAction?: (formData: FormData) => Promise<void>;
+  backHref?: string;
+  categoriasHref?: string;
   plato?: {
     id: number;
     nombre: string;
@@ -44,7 +51,13 @@ function campo(
   return (plato[key] as string | null) ?? "";
 }
 
-export default function PlatoForm({ plato, categorias }: Props) {
+export default function PlatoForm({
+  plato,
+  categorias,
+  saveAction = savePlato,
+  backHref = "/dashboard",
+  categoriasHref = "/dashboard/categorias",
+}: Props) {
   const router = useRouter();
   const toast = useToast();
   const [error, setError] = useState<string | null>(null);
@@ -78,9 +91,9 @@ export default function PlatoForm({ plato, categorias }: Props) {
     }
     setLoading(true);
     try {
-      await savePlato(formData);
+      await saveAction(formData);
       toast.success(plato ? "Plato actualizado." : "Plato creado.");
-      router.push("/dashboard");
+      router.push(backHref);
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "No se pudo guardar el plato.");
@@ -127,7 +140,7 @@ export default function PlatoForm({ plato, categorias }: Props) {
         {categorias.length === 0 && (
           <p className="mt-1.5 text-xs text-amber-700">
             Todavía no tienes categorías.{" "}
-            <Link href="/dashboard/categorias" className="underline">
+            <Link href={categoriasHref} className="underline">
               Crea una primero
             </Link>
             .
@@ -282,7 +295,7 @@ export default function PlatoForm({ plato, categorias }: Props) {
         </button>
         <button
           type="button"
-          onClick={() => router.push("/dashboard")}
+          onClick={() => router.push(backHref)}
           className="rounded-lg border border-slate-300 px-4 py-3 text-base font-medium text-slate-700 hover:bg-slate-50"
         >
           Cancelar

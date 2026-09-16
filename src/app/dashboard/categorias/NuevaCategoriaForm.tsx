@@ -8,8 +8,12 @@ import { CATEGORIAS_PREDEFINIDAS } from "@/lib/categoriasPredefinidas";
 
 export default function NuevaCategoriaForm({
   categoriasExistentes,
+  createAction = createCategoria,
 }: {
   categoriasExistentes: string[];
+  // El panel admin pasa aquí su propia acción (admin/carta-actions.ts)
+  // para poder crear categorías en la carta de cualquier restaurante.
+  createAction?: (formData: FormData) => Promise<void>;
 }) {
   const router = useRouter();
   const toast = useToast();
@@ -33,7 +37,7 @@ export default function NuevaCategoriaForm({
             )?.es ?? "")
           : String(formData.get("nombre") ?? "").trim();
 
-      await createCategoria(formData);
+      await createAction(formData);
       router.refresh();
       const form = document.getElementById(
         "nueva-categoria-form",

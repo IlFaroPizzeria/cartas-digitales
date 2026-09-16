@@ -19,10 +19,23 @@ export default function PlatoRow({
   plato,
   esPrimera,
   esUltima,
+  toggleAction = toggleDisponible,
+  deleteAction = deletePlato,
+  moveAction = movePlato,
+  editHref,
 }: {
   plato: Plato;
   esPrimera: boolean;
   esUltima: boolean;
+  // Por defecto usan las acciones del dueño (dashboard/actions.ts), que
+  // solo pueden tocar el negocio del usuario logueado. El panel admin
+  // (src/app/admin/restaurantes/[id]/carta) pasa aquí sus propias
+  // versiones (admin/carta-actions.ts) para poder editar la carta de
+  // cualquier restaurante en casos puntuales.
+  toggleAction?: (platoId: number, disponible: boolean) => Promise<void>;
+  deleteAction?: (platoId: number) => Promise<void>;
+  moveAction?: (platoId: number, direccion: "arriba" | "abajo") => Promise<void>;
+  editHref?: string;
 }) {
   const [disponible, setDisponible] = useState(plato.disponible);
   const [deleting, setDeleting] = useState(false);
@@ -35,7 +48,7 @@ export default function PlatoRow({
     setDisponible(next);
     startTransition(async () => {
       try {
-        await toggleDisponible(plato.id, next);
+        await toggleAction(plato.id, next);
       } catch {
         setDisponible(!next);
         toast.error("No se pudo actualizar la disponibilidad.");
@@ -48,7 +61,7 @@ export default function PlatoRow({
     setDeleting(true);
     startTransition(async () => {
       try {
-        await deletePlato(plato.id);
+        await deleteAction(plato.id);
         toast.success(`"${plato.nombre}" eliminado.`);
       } catch {
         setDeleting(false);
@@ -59,7 +72,7 @@ export default function PlatoRow({
 
   function handleMove(direccion: "arriba" | "abajo") {
     startTransition(async () => {
-      await movePlato(plato.id, direccion);
+      await moveAction(plato.id, direccion);
     });
   }
 
@@ -123,7 +136,7 @@ export default function PlatoRow({
             {disponible ? "Disponible" : "No disponible"}
           </button>
           <Link
-            href={`/dashboard/platos/${plato.id}/editar`}
+            href={editHref ?? `/dashboard/platos/${plato.id}/editar`}
             className="text-xs font-semibold px-2.5 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:bg-slate-50"
           >
             Editar
