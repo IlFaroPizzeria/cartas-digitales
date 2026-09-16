@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { savePlato } from "@/app/dashboard/actions";
 import { ETIQUETAS } from "@/lib/etiquetas";
 import { IDIOMAS } from "@/lib/idiomas";
 import { useToast } from "@/components/ui/ToastProvider";
 
 type Props = {
+  categorias: { id: number; nombre: string }[];
   plato?: {
     id: number;
     nombre: string;
@@ -42,7 +44,7 @@ function campo(
   return (plato[key] as string | null) ?? "";
 }
 
-export default function PlatoForm({ plato }: Props) {
+export default function PlatoForm({ plato, categorias }: Props) {
   const router = useRouter();
   const toast = useToast();
   const [error, setError] = useState<string | null>(null);
@@ -100,13 +102,37 @@ export default function PlatoForm({ plato }: Props) {
         <label className="block text-sm font-medium text-slate-700 mb-1">
           Categoría
         </label>
-        <input
+        <select
           name="categoria"
           required
-          defaultValue={plato?.categoria}
-          placeholder="Ej: Entrantes"
+          defaultValue={plato?.categoria ?? ""}
+          disabled={categorias.length === 0}
           className={inputClass}
-        />
+        >
+          <option value="" disabled>
+            Elige una categoría
+          </option>
+          {plato?.categoria &&
+            !categorias.some((c) => c.nombre === plato.categoria) && (
+              <option value={plato.categoria}>
+                {plato.categoria} (ya no existe)
+              </option>
+            )}
+          {categorias.map((c) => (
+            <option key={c.id} value={c.nombre}>
+              {c.nombre}
+            </option>
+          ))}
+        </select>
+        {categorias.length === 0 && (
+          <p className="mt-1.5 text-xs text-amber-700">
+            Todavía no tienes categorías.{" "}
+            <Link href="/dashboard/categorias" className="underline">
+              Crea una primero
+            </Link>
+            .
+          </p>
+        )}
       </div>
 
       <div>
@@ -249,7 +275,7 @@ export default function PlatoForm({ plato }: Props) {
       <div className="flex gap-3 pt-1">
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || categorias.length === 0}
           className="flex-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white py-3 text-base font-medium shadow-sm transition-colors disabled:opacity-50"
         >
           {loading ? "Guardando..." : "Guardar"}

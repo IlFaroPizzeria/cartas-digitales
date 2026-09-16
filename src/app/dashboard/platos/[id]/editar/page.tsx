@@ -1,66 +1,74 @@
-import { notFound, redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import PlatoForm from '../../PlatoForm'
+import { notFound, redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import PlatoForm from "../../PlatoForm";
 
 type PlatoRow = {
-  id: number
-  nombre: string
-  nombre_en: string | null
-  nombre_de: string | null
-  nombre_it: string | null
-  nombre_sv: string | null
-  nombre_fr: string | null
-  precio: number
-  negocio_id: number
-  descripcion: string | null
-  descripcion_en: string | null
-  descripcion_de: string | null
-  descripcion_it: string | null
-  descripcion_sv: string | null
-  descripcion_fr: string | null
-  categoria: string | null
-  etiquetas: string[] | null
-}
+  id: number;
+  nombre: string;
+  nombre_en: string | null;
+  nombre_de: string | null;
+  nombre_it: string | null;
+  nombre_sv: string | null;
+  nombre_fr: string | null;
+  precio: number;
+  negocio_id: number;
+  descripcion: string | null;
+  descripcion_en: string | null;
+  descripcion_de: string | null;
+  descripcion_it: string | null;
+  descripcion_sv: string | null;
+  descripcion_fr: string | null;
+  categoria: string | null;
+  etiquetas: string[] | null;
+};
 
 export default async function EditarPlatoPage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = await params
-  const supabase = await createClient()
+  const { id } = await params;
+  const supabase = await createClient();
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
   const { data: negocio } = await supabase
-    .from('negocios')
-    .select('id')
-    .eq('owner_id', user.id)
-    .single()
+    .from("negocios")
+    .select("id")
+    .eq("owner_id", user.id)
+    .single();
 
-  if (!negocio) notFound()
+  if (!negocio) notFound();
+
+  const { data: categorias } = await supabase
+    .from("categorias")
+    .select("id, nombre")
+    .eq("negocio_id", negocio.id)
+    .order("orden", { ascending: true });
 
   // El alias con tilde ("descripción"/"categoría") no lo puede tipar el
   // generador de tipos de Supabase, igual que en la carta pública: se
   // castea explícitamente, tal y como ya hace src/app/[slug]/page.tsx.
   const { data: platoRaw } = await supabase
-    .from('platos')
+    .from("platos")
     .select(
-      'id, nombre, nombre_en, nombre_de, nombre_it, nombre_sv, nombre_fr, precio, negocio_id, descripcion:descripción, descripcion_en, descripcion_de, descripcion_it, descripcion_sv, descripcion_fr, categoria:categoría, etiquetas'
+      "id, nombre, nombre_en, nombre_de, nombre_it, nombre_sv, nombre_fr, precio, negocio_id, descripcion:descripción, descripcion_en, descripcion_de, descripcion_it, descripcion_sv, descripcion_fr, categoria:categoría, etiquetas",
     )
-    .eq('id', id)
-    .single()
+    .eq("id", id)
+    .single();
 
-  const plato = platoRaw as unknown as PlatoRow | null
+  const plato = platoRaw as unknown as PlatoRow | null;
 
-  if (!plato || plato.negocio_id !== negocio.id) notFound()
+  if (!plato || plato.negocio_id !== negocio.id) notFound();
 
   return (
     <div className="max-w-md mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-      <h1 className="text-lg font-semibold text-slate-900 mb-6">Editar plato</h1>
+      <h1 className="text-lg font-semibold text-slate-900 mb-6">
+        Editar plato
+      </h1>
       <PlatoForm
         plato={{
           id: plato.id,
@@ -77,10 +85,11 @@ export default async function EditarPlatoPage({
           descripcion_sv: plato.descripcion_sv,
           descripcion_fr: plato.descripcion_fr,
           precio: plato.precio,
-          categoria: plato.categoria ?? '',
+          categoria: plato.categoria ?? "",
           etiquetas: plato.etiquetas ?? [],
         }}
+        categorias={categorias ?? []}
       />
     </div>
-  )
+  );
 }
