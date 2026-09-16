@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { createClient as createServerSupabaseClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseJsClient } from '@supabase/supabase-js'
 import { etiquetasValidas } from '@/lib/etiquetas'
+import { IDIOMAS_TRADUCIBLES, traduccionDisponible, traducirAIdiomas } from '@/lib/translate'
 
 // Alias para no romper el resto del archivo, que ya usa `createClient()`
 // como nombre para el cliente de servidor.
@@ -42,9 +43,25 @@ async function findOrCreateCategoria(supabase: SupabaseClient, negocioId: number
 
   if (existente) return existente.id
 
+  // Traducimos el nombre de la categoría al crearla por primera vez. Si
+  // la traducción automática no está configurada o falla, se crea igual
+  // con los campos de idioma vacíos (se pueden rellenar a mano después).
+  const traducciones = traduccionDisponible()
+    ? await traducirAIdiomas(nombreLimpio, IDIOMAS_TRADUCIBLES)
+    : {}
+
+  const insercion: Record<string, unknown> = {
+    negocio_id: negocioId,
+    nombre: nombreLimpio,
+    orden: 999,
+  }
+  for (const [l, texto] of Object.entries(traducciones)) {
+    insercion[`nombre_${l}`] = texto
+  }
+
   const { data: nueva, error } = await supabase
     .from('categorias')
-    .insert({ negocio_id: negocioId, nombre: nombreLimpio, orden: 999 })
+    .insert(insercion)
     .select('id')
     .single()
 
@@ -85,15 +102,38 @@ export async function savePlato(formData: FormData) {
   const etiquetas = etiquetasValidas(formData.getAll('etiquetas').map(String))
 
   const traducciones: Record<string, string | null> = {}
-  for (const l of ['en', 'de', 'it', 'sv', 'fr']) {
-    traducciones[`nombre_${l}`] = String(formData.get(`nombre_${l}`) ?? '').trim() || null
-    traducciones[`descripcion_${l}`] =
-      String(formData.get(`descripcion_${l}`) ?? '').trim() || null
+  const idiomasFaltantesNombre: string[] = []
+  const idiomasFaltantesDescripcion: string[] = []
+  for (const l of IDIOMAS_TRADUCIBLES) {
+    const nombreTraducido = String(formData.get(`nombre_${l}`) ?? '').trim() || null
+    const descripcionTraducida = String(formData.get(`descripcion_${l}`) ?? '').trim() || null
+    traducciones[`nombre_${l}`] = nombreTraducido
+    traducciones[`descripcion_${l}`] = descripcionTraducida
+    if (!nombreTraducido) idiomasFaltantesNombre.push(l)
+    if (!descripcionTraducida) idiomasFaltantesDescripcion.push(l)
   }
 
   if (!nombre) throw new Error('El nombre es obligatorio')
   if (!Number.isFinite(precio) || precio < 0) throw new Error('El precio no es válido')
   if (!categoriaNombre) throw new Error('La categoría es obligatoria')
+
+  // Traducción automática: solo rellenamos los idiomas que el usuario ha
+  // dejado vacíos en el formulario. Si el propio usuario ya ha escrito una
+  // traducción a mano, nunca la tocamos.
+  if (traduccionDisponible()) {
+    const [nombresTraducidos, descripcionesTraducidas] = await Promise.all([
+      traducirAIdiomas(nombre, idiomasFaltantesNombre),
+      descripcion
+        ? traducirAIdiomas(descripcion, idiomasFaltantesDescripcion)
+        : Promise.resolve({} as Record<string, string>),
+    ])
+    for (const [l, texto] of Object.entries(nombresTraducidos)) {
+      traducciones[`nombre_${l}`] = texto
+    }
+    for (const [l, texto] of Object.entries(descripcionesTraducidas)) {
+      traducciones[`descripcion_${l}`] = texto
+    }
+  }
 
   const categoriaId = await findOrCreateCategoria(supabase, negocioId, categoriaNombre)
 
@@ -146,9 +186,20 @@ export async function createCategoria(formData: FormData) {
 
   const siguienteOrden = (maxOrden?.orden ?? 0) + 1
 
-  const { error } = await supabase
-    .from('categorias')
-    .insert({ negocio_id: negocioId, nombre, orden: siguienteOrden })
+  const traducciones = traduccionDisponible()
+    ? await traducirAIdiomas(nombre, IDIOMAS_TRADUCIBLES)
+    : {}
+
+  const insercion: Record<string, unknown> = {
+    negocio_id: negocioId,
+    nombre,
+    orden: siguienteOrden,
+  }
+  for (const [l, texto] of Object.entries(traducciones)) {
+    insercion[`nombre_${l}`] = texto
+  }
+
+  const { error } = await supabase.from('categorias').insert(insercion)
   if (error) throw new Error('No se pudo crear la categoría')
 
   revalidatePath('/dashboard/categorias')
