@@ -4,14 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-const WHATSAPP = "34644090462";
-const DEFAULT_MSG =
-  "Hola, me gustaría más información sobre la carta digital de Cartoca para mi restaurante.";
-
-function waLink(text: string) {
-  return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
-}
-
 const LINKS = [
   { href: "/producto", label: "Producto" },
   { href: "/precios", label: "Precios" },
@@ -66,14 +58,9 @@ export default function LandingNav() {
           <Link className="btn btn-ghost btn-sm" href="/precios">
             Ver precios
           </Link>
-          <a
-            className="btn btn-primary btn-sm"
-            href={waLink(DEFAULT_MSG)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link className="btn btn-primary btn-sm" href="/contacto">
             Habla con nosotros
-          </a>
+          </Link>
           <button
             type="button"
             className="nav-toggle"
