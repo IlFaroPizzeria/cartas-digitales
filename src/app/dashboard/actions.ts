@@ -1,8 +1,13 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
+import { createClient as createServerSupabaseClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseJsClient } from '@supabase/supabase-js'
 import { etiquetasValidas } from '@/lib/etiquetas'
+
+// Alias para no romper el resto del archivo, que ya usa `createClient()`
+// como nombre para el cliente de servidor.
+const createClient = createServerSupabaseClient
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>
 
@@ -79,6 +84,13 @@ export async function savePlato(formData: FormData) {
 
   const etiquetas = etiquetasValidas(formData.getAll('etiquetas').map(String))
 
+  const traducciones: Record<string, string | null> = {}
+  for (const l of ['en', 'de', 'it', 'sv', 'fr']) {
+    traducciones[`nombre_${l}`] = String(formData.get(`nombre_${l}`) ?? '').trim() || null
+    traducciones[`descripcion_${l}`] =
+      String(formData.get(`descripcion_${l}`) ?? '').trim() || null
+  }
+
   if (!nombre) throw new Error('El nombre es obligatorio')
   if (!Number.isFinite(precio) || precio < 0) throw new Error('El precio no es válido')
   if (!categoriaNombre) throw new Error('La categoría es obligatoria')
@@ -95,6 +107,7 @@ export async function savePlato(formData: FormData) {
         categoria_id: categoriaId,
         categoría: categoriaNombre,
         etiquetas,
+        ...traducciones,
       })
       .eq('id', id)
     if (error) throw new Error('No se pudo guardar el plato')
@@ -109,6 +122,7 @@ export async function savePlato(formData: FormData) {
       etiquetas,
       disponible: true,
       orden: 999,
+      ...traducciones,
     })
     if (error) throw new Error('No se pudo crear el plato')
   }
@@ -199,6 +213,83 @@ export async function moveCategoria(categoriaId: number, direccion: 'arriba' | '
   await supabase.from('categorias').update({ orden: actual.orden }).eq('id', otro.id)
 
   revalidatePath('/dashboard/categorias')
+  revalidatePath('/dashboard')
+}
+
+// Campos que el propio dueño puede editar sobre su negocio (branding y
+// contacto). slug/activo/plan/fecha_pago/owner_id quedan fuera a propósito
+// -- son cosas de gestión de cuenta que solo debe tocar el admin, y desde
+// Fase 15 además hay un trigger en la base de datos que lo impide aunque
+// alguien intente saltarse esta función y llamar a la API directamente.
+export async function updateNegocioConfig(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) throw new Error('No autenticado')
+  const negocioId = await getOwnedNegocioId(supabase)
+
+  const nombre = String(formData.get('nombre') ?? '').trim()
+  const tagline = String(formData.get('tagline') ?? '').trim() || null
+  const telefono = String(formData.get('telefono') ?? '').trim() || null
+  const email = String(formData.get('email') ?? '').trim() || null
+  const direccion = String(formData.get('direccion') ?? '').trim() || null
+  const color_fondo = String(formData.get('color_fondo') ?? '').trim() || null
+  const color_header = String(formData.get('color_header') ?? '').trim() || null
+  const color_acento = String(formData.get('color_acento') ?? '').trim() || null
+  const idiomas_activos = formData.getAll('idiomas_activos').map(String)
+
+  if (!nombre) throw new Error('El nombre es obligatorio')
+  if (idiomas_activos.length === 0) throw new Error('Activa al menos un idioma')
+
+  const update: Record<string, unknown> = {
+    nombre,
+    tagline,
+    telefono,
+    email,
+    direccion,
+    color_fondo,
+    color_header,
+    color_acento,
+    idiomas_activos,
+  }
+
+  const logo = formData.get('logo')
+  if (logo instanceof File && logo.size > 0) {
+    const extension = logo.name.split('.').pop() || 'png'
+    const path = `${user.id}/logo-${Date.now()}.${extension}`
+
+    // El cliente de servidor (@supabase/ssr) no siempre adjunta bien el
+    // token de sesión en las peticiones a Storage -- las llamadas a las
+    // tablas (negocios, platos...) funcionan porque van por PostgREST,
+    // pero Storage es una API distinta. Se construye aquí un cliente
+    // aparte con el access token de la sesión puesto a mano, para que la
+    // política de RLS del bucket ("solo tu propia carpeta") vea el
+    // auth.uid() correcto.
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+    if (!session) throw new Error('No autenticado')
+
+    const storageClient = createSupabaseJsClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { global: { headers: { Authorization: `Bearer ${session.access_token}` } } }
+    )
+
+    const { error: uploadError } = await storageClient.storage
+      .from('logos')
+      .upload(path, logo, { upsert: true, contentType: logo.type || undefined })
+    if (uploadError) throw new Error('No se pudo subir el logo')
+
+    const { data: publicUrlData } = storageClient.storage.from('logos').getPublicUrl(path)
+    update.logo_url = publicUrlData.publicUrl
+  }
+
+  const { error } = await supabase.from('negocios').update(update).eq('id', negocioId)
+  if (error) throw new Error('No se pudo guardar la configuración')
+
+  revalidatePath('/dashboard/configuracion')
   revalidatePath('/dashboard')
 }
 

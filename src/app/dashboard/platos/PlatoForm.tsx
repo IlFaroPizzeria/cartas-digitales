@@ -4,12 +4,23 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { savePlato } from '@/app/dashboard/actions'
 import { ETIQUETAS } from '@/lib/etiquetas'
+import { IDIOMAS } from '@/lib/idiomas'
 
 type Props = {
   plato?: {
     id: number
     nombre: string
+    nombre_en: string | null
+    nombre_de: string | null
+    nombre_it: string | null
+    nombre_sv: string | null
+    nombre_fr: string | null
     descripcion: string | null
+    descripcion_en: string | null
+    descripcion_de: string | null
+    descripcion_it: string | null
+    descripcion_sv: string | null
+    descripcion_fr: string | null
     precio: number
     categoria: string
     etiquetas: string[]
@@ -19,11 +30,19 @@ type Props = {
 const ALERGENOS = ETIQUETAS.filter((e) => e.grupo === 'alergeno')
 const DIETA = ETIQUETAS.filter((e) => e.grupo === 'dieta')
 
+function campo(plato: Props['plato'], base: 'nombre' | 'descripcion', lang: string) {
+  if (!plato) return ''
+  if (lang === 'es') return plato[base] ?? ''
+  const key = `${base}_${lang}` as keyof NonNullable<Props['plato']>
+  return (plato[key] as string | null) ?? ''
+}
+
 export default function PlatoForm({ plato }: Props) {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [lang, setLang] = useState('es')
   const [seleccionadas, setSeleccionadas] = useState<Set<string>>(
     new Set(plato?.etiquetas ?? [])
   )
@@ -39,6 +58,17 @@ export default function PlatoForm({ plato }: Props) {
 
   async function handleSubmit(formData: FormData) {
     setError(null)
+    // El nombre en español es obligatorio, pero su campo puede estar oculto
+    // si el usuario se ha quedado en otra pestaña de idioma: si se valida
+    // solo con el atributo HTML "required", el navegador bloquea el envío
+    // sin ningún aviso visible (no puede enfocar un campo con display:none).
+    // Por eso se valida aquí a mano, mostrando la pestaña de español si falta.
+    const nombreEs = String(formData.get('nombre') ?? '').trim()
+    if (!nombreEs) {
+      setLang('es')
+      setError('El nombre en español es obligatorio.')
+      return
+    }
     setLoading(true)
     try {
       await savePlato(formData)
@@ -61,11 +91,6 @@ export default function PlatoForm({ plato }: Props) {
       {Array.from(seleccionadas).map((id) => (
         <input key={id} type="hidden" name="etiquetas" value={id} />
       ))}
-
-      <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
-        <input name="nombre" required defaultValue={plato?.nombre} className={inputClass} />
-      </div>
 
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">Categoría</label>
@@ -93,13 +118,55 @@ export default function PlatoForm({ plato }: Props) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">Descripción (opcional)</label>
-        <textarea
-          name="descripcion"
-          rows={3}
-          defaultValue={plato?.descripcion ?? ''}
-          className={inputClass}
-        />
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Nombre y descripción por idioma
+        </label>
+        <p className="text-xs text-slate-500 mb-2">
+          Español es obligatorio. Los demás son opcionales — si los dejas vacíos, la carta muestra
+          el español para ese idioma.
+        </p>
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {IDIOMAS.map((idioma) => (
+            <button
+              key={idioma.id}
+              type="button"
+              onClick={() => setLang(idioma.id)}
+              className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
+                lang === idioma.id
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'
+              }`}
+            >
+              {idioma.label}
+            </button>
+          ))}
+        </div>
+
+        {IDIOMAS.map((idioma) => (
+          <div key={idioma.id} className={idioma.id === lang ? 'space-y-3' : 'hidden'}>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1">
+                Nombre {idioma.id !== 'es' && '(opcional)'}
+              </label>
+              <input
+                name={idioma.id === 'es' ? 'nombre' : `nombre_${idioma.id}`}
+                defaultValue={campo(plato, 'nombre', idioma.id)}
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1">
+                Descripción (opcional)
+              </label>
+              <textarea
+                name={idioma.id === 'es' ? 'descripcion' : `descripcion_${idioma.id}`}
+                rows={3}
+                defaultValue={campo(plato, 'descripcion', idioma.id)}
+                className={inputClass}
+              />
+            </div>
+          </div>
+        ))}
       </div>
 
       <div>

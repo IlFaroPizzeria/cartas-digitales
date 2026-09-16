@@ -12,6 +12,11 @@ type Plato = {
   categoria_sv: string | null
   categoria_fr: string | null
   nombre: string
+  nombre_en: string | null
+  nombre_de: string | null
+  nombre_it: string | null
+  nombre_sv: string | null
+  nombre_fr: string | null
   descripcion: string | null
   descripcion_en: string | null
   descripcion_de: string | null
@@ -104,6 +109,14 @@ export default function CartaClient({
     sv: 'descripcion_sv',
     fr: 'descripcion_fr',
   }
+  const NOMBRE_POR_IDIOMA: Record<Lang, keyof Plato | null> = {
+    es: null,
+    en: 'nombre_en',
+    de: 'nombre_de',
+    it: 'nombre_it',
+    sv: 'nombre_sv',
+    fr: 'nombre_fr',
+  }
 
   function categoriaTexto(p: Plato) {
     const key = CATEGORIA_POR_IDIOMA[lang]
@@ -114,6 +127,11 @@ export default function CartaClient({
     const key = DESCRIPCION_POR_IDIOMA[lang]
     if (!key) return p.descripcion
     return (p[key] as string | null) || p.descripcion
+  }
+  function nombreTexto(p: Plato) {
+    const key = NOMBRE_POR_IDIOMA[lang]
+    if (!key) return p.nombre
+    return (p[key] as string | null) || p.nombre
   }
 
   // Agrupar por categoría (en el idioma activo), preservando el orden de aparición
@@ -230,7 +248,7 @@ export default function CartaClient({
                       className="text-[17px]"
                       style={{ fontFamily: 'var(--font-display)', fontWeight: 500, color: colorHeader }}
                     >
-                      {plato.nombre}
+                      {nombreTexto(plato)}
                     </span>
                     <span className="flex-1 border-b border-dotted border-[#00000025] translate-y-[-3px]" />
                     <span

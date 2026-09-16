@@ -5,9 +5,19 @@ import PlatoForm from '../../PlatoForm'
 type PlatoRow = {
   id: number
   nombre: string
+  nombre_en: string | null
+  nombre_de: string | null
+  nombre_it: string | null
+  nombre_sv: string | null
+  nombre_fr: string | null
   precio: number
   negocio_id: number
   descripcion: string | null
+  descripcion_en: string | null
+  descripcion_de: string | null
+  descripcion_it: string | null
+  descripcion_sv: string | null
+  descripcion_fr: string | null
   categoria: string | null
   etiquetas: string[] | null
 }
@@ -38,7 +48,9 @@ export default async function EditarPlatoPage({
   // castea explícitamente, tal y como ya hace src/app/[slug]/page.tsx.
   const { data: platoRaw } = await supabase
     .from('platos')
-    .select('id, nombre, precio, negocio_id, descripcion:descripción, categoria:categoría, etiquetas')
+    .select(
+      'id, nombre, nombre_en, nombre_de, nombre_it, nombre_sv, nombre_fr, precio, negocio_id, descripcion:descripción, descripcion_en, descripcion_de, descripcion_it, descripcion_sv, descripcion_fr, categoria:categoría, etiquetas'
+    )
     .eq('id', id)
     .single()
 
@@ -53,7 +65,17 @@ export default async function EditarPlatoPage({
         plato={{
           id: plato.id,
           nombre: plato.nombre,
+          nombre_en: plato.nombre_en,
+          nombre_de: plato.nombre_de,
+          nombre_it: plato.nombre_it,
+          nombre_sv: plato.nombre_sv,
+          nombre_fr: plato.nombre_fr,
           descripcion: plato.descripcion,
+          descripcion_en: plato.descripcion_en,
+          descripcion_de: plato.descripcion_de,
+          descripcion_it: plato.descripcion_it,
+          descripcion_sv: plato.descripcion_sv,
+          descripcion_fr: plato.descripcion_fr,
           precio: plato.precio,
           categoria: plato.categoria ?? '',
           etiquetas: plato.etiquetas ?? [],

@@ -22,6 +22,11 @@ const publicSans = Public_Sans({
 type PlatoConCategoriaRaw = {
   id: number
   nombre: string
+  nombre_en: string | null
+  nombre_de: string | null
+  nombre_it: string | null
+  nombre_sv: string | null
+  nombre_fr: string | null
   precio: number
   orden: number
   disponible: boolean
@@ -87,7 +92,7 @@ export default async function CartaDigital({
   const { data: platosRaw } = await supabase
     .from('platos')
     .select(
-      'id, nombre, precio, orden, disponible, ' +
+      'id, nombre, nombre_en, nombre_de, nombre_it, nombre_sv, nombre_fr, precio, orden, disponible, ' +
       'descripcion:descripción, descripcion_en, descripcion_de, descripcion_it, descripcion_sv, descripcion_fr, etiquetas, ' +
       'categorias ( nombre, nombre_en, nombre_de, nombre_it, nombre_sv, nombre_fr, orden )'
     )
@@ -99,6 +104,11 @@ export default async function CartaDigital({
   const platos = ((platosRaw ?? []) as unknown as PlatoConCategoriaRaw[]).map((p) => ({
     id: p.id,
     nombre: p.nombre,
+    nombre_en: p.nombre_en,
+    nombre_de: p.nombre_de,
+    nombre_it: p.nombre_it,
+    nombre_sv: p.nombre_sv,
+    nombre_fr: p.nombre_fr,
     precio: p.precio,
     categoria: p.categorias?.nombre ?? 'Otros',
     categoria_en: p.categorias?.nombre_en ?? null,
