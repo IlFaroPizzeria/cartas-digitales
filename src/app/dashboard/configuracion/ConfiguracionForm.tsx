@@ -162,7 +162,7 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
           <input
             name="logo"
             type="file"
-            accept="image/png,image/jpeg,image/svg+xml,image/webp"
+            accept="image/png,image/jpeg,image/webp"
             onChange={handleLogoChange}
             className="text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium hover:file:bg-slate-200"
           />
