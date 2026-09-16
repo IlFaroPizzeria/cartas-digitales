@@ -1,9 +1,11 @@
+import Link from 'next/link'
+
 export default function LandingFooter() {
   return (
     <footer>
       <div className="wrap foot-grid">
         <div className="foot-brand">
-          <a href="/" className="brand">
+          <Link href="/" className="brand">
             <span className="brand-mark">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
                 <path d="M4 11a8 8 0 0 1 16 0" />
@@ -13,21 +15,21 @@ export default function LandingFooter() {
               </svg>
             </span>
             Cartoca
-          </a>
+          </Link>
           <p>Cartas digitales con tecnología NFC para restaurantes. Sin apps, en varios idiomas y siempre al día.</p>
         </div>
         <div className="foot-cols">
           <div className="foot-col">
             <span className="h">Producto</span>
-            <a href="/producto">Por qué Cartoca</a>
-            <a href="/producto">Cómo funciona</a>
-            <a href="/precios">Precios</a>
+            <Link href="/producto">Por qué Cartoca</Link>
+            <Link href="/producto">Cómo funciona</Link>
+            <Link href="/precios">Precios</Link>
           </div>
           <div className="foot-col">
             <span className="h">Contacto</span>
-            <a href="/contacto">Solicitar presupuesto</a>
+            <Link href="/contacto">Solicitar presupuesto</Link>
             <a href="mailto:hola@cartoca.es">hola@cartoca.es</a>
-            <a href="/preguntas">Preguntas frecuentes</a>
+            <Link href="/preguntas">Preguntas frecuentes</Link>
           </div>
         </div>
       </div>

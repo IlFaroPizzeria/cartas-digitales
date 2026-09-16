@@ -1,52 +1,57 @@
-'use client'
+"use client";
 
-import { useState, useTransition } from 'react'
-import { renameCategoria, deleteCategoria, moveCategoria } from '../actions'
+import { useState, useTransition } from "react";
+import { renameCategoria, deleteCategoria, moveCategoria } from "../actions";
+import { useToast } from "@/components/ui/ToastProvider";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
-type Categoria = { id: number; nombre: string; orden: number }
+type Categoria = { id: number; nombre: string; orden: number };
 
 export default function CategoriaRow({
   categoria,
   esPrimera,
   esUltima,
 }: {
-  categoria: Categoria
-  esPrimera: boolean
-  esUltima: boolean
+  categoria: Categoria;
+  esPrimera: boolean;
+  esUltima: boolean;
 }) {
-  const [nombre, setNombre] = useState(categoria.nombre)
-  const [editando, setEditando] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [pending, startTransition] = useTransition()
+  const [nombre, setNombre] = useState(categoria.nombre);
+  const [editando, setEditando] = useState(false);
+  const [confirmando, setConfirmando] = useState(false);
+  const [pending, startTransition] = useTransition();
+  const toast = useToast();
 
   function guardarNombre() {
-    setError(null)
     startTransition(async () => {
       try {
-        await renameCategoria(categoria.id, nombre)
-        setEditando(false)
+        await renameCategoria(categoria.id, nombre);
+        setEditando(false);
+        toast.success("Categoría renombrada.");
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'No se pudo renombrar.')
+        toast.error(e instanceof Error ? e.message : "No se pudo renombrar.");
       }
-    })
+    });
   }
 
-  function eliminar() {
-    if (!confirm(`¿Eliminar la categoría "${categoria.nombre}"?`)) return
-    setError(null)
+  function confirmarEliminar() {
+    setConfirmando(false);
     startTransition(async () => {
       try {
-        await deleteCategoria(categoria.id)
+        await deleteCategoria(categoria.id);
+        toast.success(`Categoría "${categoria.nombre}" eliminada.`);
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'No se pudo eliminar.')
+        toast.error(
+          e instanceof Error ? e.message : "No se pudo eliminar la categoría.",
+        );
       }
-    })
+    });
   }
 
-  function mover(direccion: 'arriba' | 'abajo') {
+  function mover(direccion: "arriba" | "abajo") {
     startTransition(async () => {
-      await moveCategoria(categoria.id, direccion)
-    })
+      await moveCategoria(categoria.id, direccion);
+    });
   }
 
   return (
@@ -60,13 +65,15 @@ export default function CategoriaRow({
             autoFocus
           />
         ) : (
-          <span className="text-[15px] font-medium text-slate-900 truncate">{categoria.nombre}</span>
+          <span className="text-[15px] font-medium text-slate-900 truncate">
+            {categoria.nombre}
+          </span>
         )}
 
         <div className="flex items-center gap-1.5 shrink-0">
           <div className="flex rounded-md border border-slate-200 overflow-hidden">
             <button
-              onClick={() => mover('arriba')}
+              onClick={() => mover("arriba")}
               disabled={esPrimera || pending}
               className="px-1.5 py-1 text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent border-r border-slate-200"
               aria-label="Subir"
@@ -74,7 +81,7 @@ export default function CategoriaRow({
               ↑
             </button>
             <button
-              onClick={() => mover('abajo')}
+              onClick={() => mover("abajo")}
               disabled={esUltima || pending}
               className="px-1.5 py-1 text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent"
               aria-label="Bajar"
@@ -101,7 +108,7 @@ export default function CategoriaRow({
           )}
 
           <button
-            onClick={eliminar}
+            onClick={() => setConfirmando(true)}
             disabled={pending}
             className="text-xs font-semibold px-2.5 py-1.5 rounded-full border border-red-200 text-red-700 hover:bg-red-50"
           >
@@ -109,7 +116,14 @@ export default function CategoriaRow({
           </button>
         </div>
       </div>
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      <ConfirmDialog
+        open={confirmando}
+        title={`¿Eliminar la categoría "${categoria.nombre}"?`}
+        description="Si tiene platos dentro, primero tendrás que moverlos o borrarlos."
+        pending={pending}
+        onConfirm={confirmarEliminar}
+        onCancel={() => setConfirmando(false)}
+      />
     </li>
-  )
+  );
 }

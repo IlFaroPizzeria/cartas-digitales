@@ -1,82 +1,90 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { useState, useTransition } from 'react'
-import { toggleDisponible, deletePlato, movePlato } from './actions'
-import { etiquetaPorId } from '@/lib/etiquetas'
+import Link from "next/link";
+import { useState, useTransition } from "react";
+import { toggleDisponible, deletePlato, movePlato } from "./actions";
+import { etiquetaPorId } from "@/lib/etiquetas";
+import { useToast } from "@/components/ui/ToastProvider";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 type Plato = {
-  id: number
-  nombre: string
-  precio: number
-  disponible: boolean
-  etiquetas: string[] | null
-}
+  id: number;
+  nombre: string;
+  precio: number;
+  disponible: boolean;
+  etiquetas: string[] | null;
+};
 
 export default function PlatoRow({
   plato,
   esPrimera,
   esUltima,
 }: {
-  plato: Plato
-  esPrimera: boolean
-  esUltima: boolean
+  plato: Plato;
+  esPrimera: boolean;
+  esUltima: boolean;
 }) {
-  const [disponible, setDisponible] = useState(plato.disponible)
-  const [deleting, setDeleting] = useState(false)
-  const [pending, startTransition] = useTransition()
-  const [error, setError] = useState<string | null>(null)
+  const [disponible, setDisponible] = useState(plato.disponible);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmando, setConfirmando] = useState(false);
+  const [pending, startTransition] = useTransition();
+  const toast = useToast();
 
   function handleToggle() {
-    const next = !disponible
-    setDisponible(next)
-    setError(null)
+    const next = !disponible;
+    setDisponible(next);
     startTransition(async () => {
       try {
-        await toggleDisponible(plato.id, next)
+        await toggleDisponible(plato.id, next);
       } catch {
-        setDisponible(!next)
-        setError('No se pudo actualizar.')
+        setDisponible(!next);
+        toast.error("No se pudo actualizar la disponibilidad.");
       }
-    })
+    });
   }
 
-  function handleDelete() {
-    if (!confirm(`¿Eliminar "${plato.nombre}"? Esta acción no se puede deshacer.`)) return
-    setDeleting(true)
-    setError(null)
+  function confirmarEliminar() {
+    setConfirmando(false);
+    setDeleting(true);
     startTransition(async () => {
       try {
-        await deletePlato(plato.id)
+        await deletePlato(plato.id);
+        toast.success(`"${plato.nombre}" eliminado.`);
       } catch {
-        setDeleting(false)
-        setError('No se pudo eliminar.')
+        setDeleting(false);
+        toast.error("No se pudo eliminar el plato.");
       }
-    })
+    });
   }
 
-  function handleMove(direccion: 'arriba' | 'abajo') {
+  function handleMove(direccion: "arriba" | "abajo") {
     startTransition(async () => {
-      await movePlato(plato.id, direccion)
-    })
+      await movePlato(plato.id, direccion);
+    });
   }
 
   return (
-    <li className={`py-3.5 ${deleting ? 'opacity-40 pointer-events-none' : ''}`}>
+    <li
+      className={`py-3.5 ${deleting ? "opacity-40 pointer-events-none" : ""}`}
+    >
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="min-w-0 mr-auto">
-          <p className="text-[15px] font-medium text-slate-900 truncate">{plato.nombre}</p>
-          <p className="text-sm text-slate-600 tabular-nums">{Number(plato.precio).toFixed(2)} €</p>
+          <p className="text-[15px] font-medium text-slate-900 truncate">
+            {plato.nombre}
+          </p>
+          <p className="text-sm text-slate-600 tabular-nums">
+            {Number(plato.precio).toFixed(2)} €
+          </p>
           {plato.etiquetas && plato.etiquetas.length > 0 && (
             <div className="mt-1 flex flex-wrap gap-1">
               {plato.etiquetas.map((id) => {
-                const etiqueta = etiquetaPorId(id)
-                if (!etiqueta) return null
+                const etiqueta = etiquetaPorId(id);
+                if (!etiqueta) return null;
                 return (
                   <span key={id} title={etiqueta.label.es} className="text-xs">
                     {etiqueta.emoji}
                   </span>
-                )
+                );
               })}
             </div>
           )}
@@ -84,7 +92,7 @@ export default function PlatoRow({
         <div className="flex items-center gap-1.5 shrink-0">
           <div className="flex rounded-md border border-slate-200 overflow-hidden">
             <button
-              onClick={() => handleMove('arriba')}
+              onClick={() => handleMove("arriba")}
               disabled={esPrimera || pending}
               className="px-1.5 py-1 text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent border-r border-slate-200"
               aria-label="Subir"
@@ -92,7 +100,7 @@ export default function PlatoRow({
               ↑
             </button>
             <button
-              onClick={() => handleMove('abajo')}
+              onClick={() => handleMove("abajo")}
               disabled={esUltima || pending}
               className="px-1.5 py-1 text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent"
               aria-label="Bajar"
@@ -105,14 +113,14 @@ export default function PlatoRow({
             disabled={pending}
             className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-full border whitespace-nowrap ${
               disponible
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                : 'bg-slate-100 text-slate-600 border-slate-300'
+                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                : "bg-slate-100 text-slate-600 border-slate-300"
             }`}
           >
             <span
-              className={`h-1.5 w-1.5 rounded-full ${disponible ? 'bg-emerald-500' : 'bg-slate-400'}`}
+              className={`h-1.5 w-1.5 rounded-full ${disponible ? "bg-emerald-500" : "bg-slate-400"}`}
             />
-            {disponible ? 'Disponible' : 'No disponible'}
+            {disponible ? "Disponible" : "No disponible"}
           </button>
           <Link
             href={`/dashboard/platos/${plato.id}/editar`}
@@ -121,7 +129,7 @@ export default function PlatoRow({
             Editar
           </Link>
           <button
-            onClick={handleDelete}
+            onClick={() => setConfirmando(true)}
             disabled={pending}
             className="text-xs font-semibold px-2.5 py-1.5 rounded-full border border-red-200 text-red-700 hover:bg-red-50"
           >
@@ -129,7 +137,14 @@ export default function PlatoRow({
           </button>
         </div>
       </div>
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      <ConfirmDialog
+        open={confirmando}
+        title={`¿Eliminar "${plato.nombre}"?`}
+        description="Esta acción no se puede deshacer."
+        pending={pending && deleting}
+        onConfirm={confirmarEliminar}
+        onCancel={() => setConfirmando(false)}
+      />
     </li>
-  )
+  );
 }
