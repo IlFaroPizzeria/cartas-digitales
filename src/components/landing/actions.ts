@@ -9,6 +9,23 @@ const FROM_EMAIL = 'Cartoca <onboarding@resend.dev>'
 
 export type QuoteFormState = { ok: boolean; message: string } | null
 
+// Mismos precios que la calculadora de /precios y el formulario (ver
+// src/components/landing/LandingScript.tsx y QuotePresupuestoForm.tsx) --
+// se recalculan aquí, en el servidor, en vez de fiarse de un total que
+// mande el navegador.
+const BASE_PRICE = 50
+const MENU_TIER_THRESHOLD = 30
+const MENU_BASE = 20
+const MENU_DISCOUNT = 18
+const REVIEW_TIER_THRESHOLD = 5
+const REVIEW_BASE = 30
+const REVIEW_DISCOUNT = 25
+
+function tierPrice(qty: number, base: number, discounted: number, threshold: number) {
+  if (qty <= 0) return 0
+  return qty * (qty >= threshold ? discounted : base)
+}
+
 export async function enviarSolicitudPresupuesto(
   _prevState: QuoteFormState,
   formData: FormData
@@ -16,10 +33,14 @@ export async function enviarSolicitudPresupuesto(
   const restaurante = String(formData.get('restaurante') ?? '').trim()
   const ciudad = String(formData.get('ciudad') ?? '').trim()
   const pais = String(formData.get('pais') ?? '').trim()
-  const tarjetasMenu = String(formData.get('tarjetasMenu') ?? '0')
-  const tarjetasResenas = String(formData.get('tarjetasResenas') ?? '0')
+  const tarjetasMenu = Number(formData.get('tarjetasMenu') ?? '0') || 0
+  const tarjetasResenas = Number(formData.get('tarjetasResenas') ?? '0') || 0
   const accesoPlataforma = formData.get('accesoPlataforma') === 'on' ? 'Sí' : 'No'
   const mensaje = String(formData.get('mensaje') ?? '').trim()
+
+  const menuCost = tierPrice(tarjetasMenu, MENU_BASE, MENU_DISCOUNT, MENU_TIER_THRESHOLD)
+  const reviewCost = tierPrice(tarjetasResenas, REVIEW_BASE, REVIEW_DISCOUNT, REVIEW_TIER_THRESHOLD)
+  const totalEstimado = BASE_PRICE + menuCost + reviewCost
 
   if (!restaurante || !ciudad || !pais) {
     return { ok: false, message: 'Rellena al menos el nombre del restaurante, la ciudad y el país.' }
@@ -42,9 +63,11 @@ export async function enviarSolicitudPresupuesto(
       `Restaurante: ${restaurante}`,
       `Ciudad: ${ciudad}`,
       `País: ${pais}`,
+      `Digitalización de la carta: ${BASE_PRICE}€ (incluido siempre)`,
       `Tarjetas NFC de menú: ${tarjetasMenu}`,
       `Tarjetas NFC de reseñas: ${tarjetasResenas}`,
       `Acceso a la plataforma: ${accesoPlataforma}`,
+      `Pago único estimado: ${totalEstimado}€`,
       '',
       'Mensaje:',
       mensaje || '(sin mensaje)',

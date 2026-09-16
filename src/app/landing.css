@@ -450,6 +450,7 @@
   .landing .quote-stepper-row:first-child{border-top:none;}
   .landing .quote-stepper-row .qs-label{font-size:13.5px;font-weight:700;}
   .landing .quote-stepper-row .qs-help{font-size:11.5px;color:var(--ink-faint);margin-top:2px;}
+  .landing .quote-stepper-row .qs-fixed{font-size:15px;font-weight:600;}
   .landing .quote-msg{font-size:13px;font-weight:600;padding:11px 13px;border-radius:10px;}
   .landing .quote-msg.ok{background:var(--accent-soft);color:var(--accent-dark);}
   .landing .quote-msg.err{background:rgba(165,67,47,0.1);color:var(--danger);}

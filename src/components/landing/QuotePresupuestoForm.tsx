@@ -1,15 +1,37 @@
 'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState, useMemo, useState } from 'react'
 import { enviarSolicitudPresupuesto, type QuoteFormState } from './actions'
 
 const initialState: QuoteFormState = null
+
+// Mismos precios e importe base que la calculadora de /precios (ver
+// src/components/landing/LandingScript.tsx) -- si cambian ahí, cambian
+// también aquí para que ambas páginas digan siempre lo mismo.
+const BASE_PRICE = 50
+const MENU_TIER_THRESHOLD = 30
+const MENU_BASE = 20
+const MENU_DISCOUNT = 18
+const REVIEW_TIER_THRESHOLD = 5
+const REVIEW_BASE = 30
+const REVIEW_DISCOUNT = 25
+
+function tierPrice(qty: number, base: number, discounted: number, threshold: number) {
+  if (qty <= 0) return 0
+  return qty * (qty >= threshold ? discounted : base)
+}
 
 export default function QuotePresupuestoForm() {
   const [state, formAction, pending] = useActionState(enviarSolicitudPresupuesto, initialState)
   const [tarjetasMenu, setTarjetasMenu] = useState(6)
   const [tarjetasResenas, setTarjetasResenas] = useState(1)
   const [accesoPlataforma, setAccesoPlataforma] = useState(false)
+
+  const total = useMemo(() => {
+    const menuCost = tierPrice(tarjetasMenu, MENU_BASE, MENU_DISCOUNT, MENU_TIER_THRESHOLD)
+    const reviewCost = tierPrice(tarjetasResenas, REVIEW_BASE, REVIEW_DISCOUNT, REVIEW_TIER_THRESHOLD)
+    return BASE_PRICE + menuCost + reviewCost
+  }, [tarjetasMenu, tarjetasResenas])
 
   return (
     <form className="quote-form" action={formAction}>
@@ -30,6 +52,13 @@ export default function QuotePresupuestoForm() {
       </div>
 
       <div className="quote-steppers">
+        <div className="quote-stepper-row">
+          <div>
+            <div className="qs-label">Digitalización de la carta</div>
+            <div className="qs-help">Incluido siempre, pago único</div>
+          </div>
+          <div className="qs-fixed mono">{BASE_PRICE}€</div>
+        </div>
         <div className="quote-stepper-row">
           <div>
             <div className="qs-label">Tarjetas NFC de menú</div>
@@ -75,6 +104,17 @@ export default function QuotePresupuestoForm() {
           />
         </div>
       </div>
+
+      <div className="calc-total">
+        <span className="t-label">Pago único estimado</span>
+        <span className="t-amount mono">{total}€</span>
+      </div>
+      {accesoPlataforma && (
+        <div className="calc-sub">
+          <span>+ Acceso a la plataforma</span>
+          <span className="mono">desde 25€/mes</span>
+        </div>
+      )}
 
       <input type="hidden" name="tarjetasMenu" value={tarjetasMenu} />
       <input type="hidden" name="tarjetasResenas" value={tarjetasResenas} />
