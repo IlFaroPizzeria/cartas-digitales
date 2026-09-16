@@ -58,7 +58,7 @@ export default function ToastProvider({
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className="fixed inset-x-0 bottom-0 z-[60] flex flex-col items-center gap-2 p-4 sm:items-end pointer-events-none">
+      <div className="fixed inset-x-0 bottom-0 z-[60] flex flex-col items-center gap-2 p-4 pb-20 lg:pb-4 sm:items-end pointer-events-none">
         {toasts.map((t) => (
           <div
             key={t.id}

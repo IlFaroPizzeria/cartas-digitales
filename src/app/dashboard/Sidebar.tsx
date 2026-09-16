@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import LogoutButton from './LogoutButton'
@@ -9,6 +8,7 @@ const LINKS = [
   {
     href: '/dashboard',
     label: 'Mi carta',
+    mobileLabel: 'Carta',
     match: (p: string) => p === '/dashboard' || p.startsWith('/dashboard/platos'),
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -21,6 +21,7 @@ const LINKS = [
   {
     href: '/dashboard/categorias',
     label: 'Categorías',
+    mobileLabel: 'Categorías',
     match: (p: string) => p.startsWith('/dashboard/categorias'),
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -31,6 +32,7 @@ const LINKS = [
   {
     href: '/dashboard/configuracion',
     label: 'Configuración',
+    mobileLabel: 'Ajustes',
     match: (p: string) => p.startsWith('/dashboard/configuracion'),
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -42,6 +44,7 @@ const LINKS = [
   {
     href: '/dashboard/cuenta',
     label: 'Mi cuenta',
+    mobileLabel: 'Cuenta',
     match: (p: string) => p.startsWith('/dashboard/cuenta'),
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -78,7 +81,7 @@ function BrandBlock({ nombreNegocio, slug }: { nombreNegocio: string; slug: stri
   )
 }
 
-function NavLinks({ isAdmin, onNavigate }: { isAdmin: boolean; onNavigate?: () => void }) {
+function NavLinks({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname()
   return (
     <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
@@ -88,7 +91,6 @@ function NavLinks({ isAdmin, onNavigate }: { isAdmin: boolean; onNavigate?: () =
           <Link
             key={link.href}
             href={link.href}
-            onClick={onNavigate}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
               active
                 ? 'bg-indigo-50 text-indigo-700'
@@ -105,7 +107,6 @@ function NavLinks({ isAdmin, onNavigate }: { isAdmin: boolean; onNavigate?: () =
       {isAdmin && (
         <Link
           href="/admin"
-          onClick={onNavigate}
           className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 mt-2 border-t border-slate-100 pt-4"
         >
           <span className="h-5 w-5 shrink-0 text-slate-400">
@@ -120,6 +121,42 @@ function NavLinks({ isAdmin, onNavigate }: { isAdmin: boolean; onNavigate?: () =
   )
 }
 
+// Barra de pestañas fija abajo, pensada para manejar la carta desde el
+// móvil con el pulgar: siempre visible, sin menús ocultos que encontrar.
+function BottomNav() {
+  const pathname = usePathname()
+  return (
+    <nav
+      className="lg:hidden fixed inset-x-0 bottom-0 z-30 bg-white border-t border-slate-200"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
+      <div className="grid grid-cols-4">
+        {LINKS.map((link) => {
+          const active = link.match(pathname)
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="flex flex-col items-center justify-center gap-0.5 py-2 min-w-0"
+            >
+              <span className={`h-5 w-5 shrink-0 ${active ? 'text-indigo-600' : 'text-slate-400'}`}>
+                {link.icon}
+              </span>
+              <span
+                className={`text-[10.5px] font-medium leading-tight truncate max-w-full px-0.5 ${
+                  active ? 'text-indigo-600' : 'text-slate-500'
+                }`}
+              >
+                {link.mobileLabel}
+              </span>
+            </Link>
+          )
+        })}
+      </div>
+    </nav>
+  )
+}
+
 export default function Sidebar({
   nombreNegocio,
   slug,
@@ -129,8 +166,6 @@ export default function Sidebar({
   slug: string | null
   isAdmin: boolean
 }) {
-  const [abierto, setAbierto] = useState(false)
-
   return (
     <>
       {/* Sidebar fija en escritorio */}
@@ -142,7 +177,9 @@ export default function Sidebar({
         </div>
       </aside>
 
-      {/* Barra superior + menú desplegable en móvil */}
+      {/* Cabecera compacta en móvil: marca + accesos rápidos. La navegación
+          principal vive en la barra de pestañas de abajo (BottomNav), no
+          aquí, para que nunca quede escondida en un menú. */}
       <header className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200">
         <div className="flex items-center justify-between h-14 px-4">
           <div className="flex items-center gap-2 min-w-0">
@@ -151,45 +188,39 @@ export default function Sidebar({
             </span>
             <span className="text-sm font-semibold text-slate-900 truncate">{nombreNegocio}</span>
           </div>
-          <button
-            onClick={() => setAbierto(true)}
-            aria-label="Abrir menú"
-            className="flex items-center justify-center h-9 w-9 rounded-lg text-slate-600 hover:bg-slate-100"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-0.5 shrink-0">
+            {slug && (
+              <a
+                href={`https://cartoca.es/${slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Ver mi carta pública"
+                title="Ver mi carta pública"
+                className="flex items-center justify-center h-9 w-9 rounded-lg text-slate-500 hover:bg-slate-100"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                  <path d="M7 17 17 7M8 7h9v9" />
+                </svg>
+              </a>
+            )}
+            {isAdmin && (
+              <Link
+                href="/admin"
+                aria-label="Panel admin"
+                title="Panel admin"
+                className="flex items-center justify-center h-9 w-9 rounded-lg text-slate-500 hover:bg-slate-100"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                  <path d="M12 3 4 6.5v5c0 4.7 3.2 8.4 8 9.5 4.8-1.1 8-4.8 8-9.5v-5L12 3Z" />
+                </svg>
+              </Link>
+            )}
+            <LogoutButton icon />
+          </div>
         </div>
       </header>
 
-      {abierto && (
-        <div className="lg:hidden fixed inset-0 z-40">
-          <div
-            className="absolute inset-0 bg-slate-900/40"
-            onClick={() => setAbierto(false)}
-          />
-          <div className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-white shadow-xl flex flex-col">
-            <div className="flex items-center justify-between px-5 pt-5">
-              <span className="text-sm font-semibold text-slate-900">Menú</span>
-              <button
-                onClick={() => setAbierto(false)}
-                aria-label="Cerrar menú"
-                className="flex items-center justify-center h-8 w-8 rounded-lg text-slate-500 hover:bg-slate-100"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <path d="M6 6l12 12M18 6 6 18" />
-                </svg>
-              </button>
-            </div>
-            <BrandBlock nombreNegocio={nombreNegocio} slug={slug} />
-            <NavLinks isAdmin={isAdmin} onNavigate={() => setAbierto(false)} />
-            <div className="px-3 py-4 border-t border-slate-100">
-              <LogoutButton />
-            </div>
-          </div>
-        </div>
-      )}
+      <BottomNav />
     </>
   )
 }

@@ -63,7 +63,9 @@ export default async function DashboardLayout({
               </div>
             </div>
           )}
-          <main className="max-w-3xl mx-auto px-4 py-6 lg:py-8">{children}</main>
+          <main className="max-w-3xl mx-auto px-4 pt-6 pb-28 lg:pt-8 lg:pb-8">
+            {children}
+          </main>
         </div>
       </div>
     </ToastProvider>
