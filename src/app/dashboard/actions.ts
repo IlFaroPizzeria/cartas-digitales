@@ -179,39 +179,59 @@ export async function createCategoria(formData: FormData) {
   const supabase = await createClient()
   const negocioId = await getOwnedNegocioId(supabase)
 
-  // Las categorías ya no se escriben a mano: se eligen de una lista fija
-  // (ver src/lib/categoriasPredefinidas.ts), así todas llegan con sus
-  // traducciones y un nombre consistente entre restaurantes.
+  // Dos formas de crear una categoría: eligiendo una de la lista fija
+  // (llega con sus traducciones ya escritas a mano) o escribiendo un
+  // nombre propio, para restaurantes cuyas secciones no encajan en la
+  // lista habitual (ej. "Sushi", "Menú del día"...).
   const categoriaId = String(formData.get('categoriaId') ?? '').trim()
-  const predefinida = buscarCategoriaPredefinida(categoriaId)
-  if (!predefinida) throw new Error('Elige una categoría de la lista')
+  const nombrePersonalizado = String(formData.get('nombre') ?? '').trim()
 
-  const { data: existente } = await supabase
+  let nombre: string
+  const traducciones: Record<string, string | null> = {}
+
+  if (categoriaId) {
+    const predefinida = buscarCategoriaPredefinida(categoriaId)
+    if (!predefinida) throw new Error('Elige una categoría de la lista')
+    nombre = predefinida.es
+    traducciones.nombre_en = predefinida.en
+    traducciones.nombre_de = predefinida.de
+    traducciones.nombre_it = predefinida.it
+    traducciones.nombre_sv = predefinida.sv
+    traducciones.nombre_fr = predefinida.fr
+  } else {
+    if (!nombrePersonalizado) throw new Error('Escribe un nombre para la categoría')
+    if (nombrePersonalizado.length > 40) {
+      throw new Error('El nombre es demasiado largo (máximo 40 caracteres)')
+    }
+    nombre = nombrePersonalizado
+
+    // Si la traducción automática está activada, se rellena aquí. Si no,
+    // se deja en blanco y la carta pública muestra el nombre en español
+    // en los demás idiomas hasta que se traduzca -- igual que con los
+    // platos (ver src/lib/translate.ts).
+    const traducidas = await traducirAIdiomas(nombre, IDIOMAS_TRADUCIBLES)
+    for (const l of IDIOMAS_TRADUCIBLES) {
+      traducciones[`nombre_${l}`] = traducidas[l] ?? null
+    }
+  }
+
+  const { data: existentes } = await supabase
     .from('categorias')
-    .select('id')
+    .select('id, nombre, orden')
     .eq('negocio_id', negocioId)
-    .eq('nombre', predefinida.es)
-    .maybeSingle()
-  if (existente) throw new Error('Ya tienes esa categoría')
 
-  const { data: maxOrden } = await supabase
-    .from('categorias')
-    .select('orden')
-    .eq('negocio_id', negocioId)
-    .order('orden', { ascending: false })
-    .limit(1)
-    .maybeSingle()
+  const yaExiste = (existentes ?? []).some(
+    (c) => c.nombre.trim().toLowerCase() === nombre.trim().toLowerCase(),
+  )
+  if (yaExiste) throw new Error('Ya tienes esa categoría')
 
-  const siguienteOrden = (maxOrden?.orden ?? 0) + 1
+  const siguienteOrden =
+    (existentes ?? []).reduce((max, c) => Math.max(max, c.orden ?? 0), 0) + 1
 
   const { error } = await supabase.from('categorias').insert({
     negocio_id: negocioId,
-    nombre: predefinida.es,
-    nombre_en: predefinida.en,
-    nombre_de: predefinida.de,
-    nombre_it: predefinida.it,
-    nombre_sv: predefinida.sv,
-    nombre_fr: predefinida.fr,
+    nombre,
+    ...traducciones,
     orden: siguienteOrden,
   })
   if (error) throw new Error('No se pudo crear la categoría')
