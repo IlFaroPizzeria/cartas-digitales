@@ -389,6 +389,13 @@
     .landing .founder-card{grid-template-columns:1fr;padding:30px;gap:22px;}
     .landing .nav-links{display:none;}
     .landing .nav-toggle{display:flex;}
+    /* En tablet/móvil la barra superior se queda solo con la marca y el
+       botón de menú: "Ver precios", "Habla con nosotros" y el portal de
+       clientes ya están dentro del menú desplegable (Precios, Contacto,
+       Portal de clientes), y dejarlos aquí también no cabía en pantallas
+       estrechas -- se salían del ancho de la pantalla. */
+    .landing .nav-actions .btn{display:none;}
+    .landing .nav-portal-link{display:none;}
     .landing .section{padding-block:64px;}
     .landing .final-cta{padding:36px 26px;flex-direction:column;align-items:flex-start;}
   }
@@ -397,10 +404,6 @@
     .landing .process-row{grid-template-columns:1fr;gap:8px;}
     .landing .tap-stage{flex-direction:column;}
     .landing .tap-card{order:2;}
-    /* En pantallas estrechas el enlace al portal ya está en el menú
-       desplegable (nav-mobile); en la barra superior solo estorbaría
-       junto a los dos botones de CTA. */
-    .landing .nav-portal-link{display:none;}
   }
 
   /* ---------- PAGE ENTRANCE ---------- */
