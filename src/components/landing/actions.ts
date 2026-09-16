@@ -5,7 +5,7 @@
 // solo recibe un mensaje de éxito o error, nunca el email de destino.
 const RESEND_API_URL = 'https://api.resend.com/emails'
 const TO_EMAIL = 'nils.podadera@gmail.com'
-const FROM_EMAIL = 'Cartoca <onboarding@resend.dev>'
+const FROM_EMAIL = 'Cartoca <hola@cartoca.es>'
 
 export type QuoteFormState = { ok: boolean; message: string } | null
 
