@@ -79,7 +79,7 @@ async function main() {
   if (errCategorias) throw errCategorias
 
   let categoriasActualizadas = 0
-  for (const cat of (categorias ?? []) as FilaConIdiomas[]) {
+  for (const cat of (categorias ?? []) as unknown as FilaConIdiomas[]) {
     const faltantes = IDIOMAS_TRADUCIBLES.filter((l) => !cat[`nombre_${l}`])
     if (faltantes.length === 0) continue
 
@@ -108,7 +108,7 @@ async function main() {
   if (errPlatos) throw errPlatos
 
   let platosActualizados = 0
-  for (const p of (platos ?? []) as FilaConIdiomas[]) {
+  for (const p of (platos ?? []) as unknown as FilaConIdiomas[]) {
     const faltantesNombre = IDIOMAS_TRADUCIBLES.filter((l) => !p[`nombre_${l}`])
     const descripcion = (p['descripción'] as string | null) ?? null
     const faltantesDescripcion = descripcion

@@ -5,6 +5,7 @@ import { createClient as createServerSupabaseClient } from '@/lib/supabase/serve
 import { createClient as createSupabaseJsClient } from '@supabase/supabase-js'
 import { etiquetasValidas } from '@/lib/etiquetas'
 import { IDIOMAS_TRADUCIBLES, traduccionDisponible, traducirAIdiomas } from '@/lib/translate'
+import { buscarCategoriaPredefinida, traduccionesPorNombreEs } from '@/lib/categoriasPredefinidas'
 
 // Alias para no romper el resto del archivo, que ya usa `createClient()`
 // como nombre para el cliente de servidor.
@@ -43,20 +44,24 @@ async function findOrCreateCategoria(supabase: SupabaseClient, negocioId: number
 
   if (existente) return existente.id
 
-  // Traducimos el nombre de la categoría al crearla por primera vez. Si
-  // la traducción automática no está configurada o falla, se crea igual
-  // con los campos de idioma vacíos (se pueden rellenar a mano después).
-  const traducciones = traduccionDisponible()
-    ? await traducirAIdiomas(nombreLimpio, IDIOMAS_TRADUCIBLES)
-    : {}
+  // A partir de aquí, las categorías solo se crean desde la lista fija
+  // (ver createCategoria más abajo); esto es un respaldo por si el
+  // nombre no coincide con ninguna categoría ya existente del negocio.
+  // Usamos las traducciones ya escritas a mano en la lista predefinida,
+  // sin depender de la traducción automática.
+  const traducciones = traduccionesPorNombreEs(nombreLimpio)
 
   const insercion: Record<string, unknown> = {
     negocio_id: negocioId,
     nombre: nombreLimpio,
     orden: 999,
   }
-  for (const [l, texto] of Object.entries(traducciones)) {
-    insercion[`nombre_${l}`] = texto
+  if (traducciones) {
+    insercion.nombre_en = traducciones.en
+    insercion.nombre_de = traducciones.de
+    insercion.nombre_it = traducciones.it
+    insercion.nombre_sv = traducciones.sv
+    insercion.nombre_fr = traducciones.fr
   }
 
   const { data: nueva, error } = await supabase
@@ -173,8 +178,21 @@ export async function savePlato(formData: FormData) {
 export async function createCategoria(formData: FormData) {
   const supabase = await createClient()
   const negocioId = await getOwnedNegocioId(supabase)
-  const nombre = String(formData.get('nombre') ?? '').trim()
-  if (!nombre) throw new Error('El nombre es obligatorio')
+
+  // Las categorías ya no se escriben a mano: se eligen de una lista fija
+  // (ver src/lib/categoriasPredefinidas.ts), así todas llegan con sus
+  // traducciones y un nombre consistente entre restaurantes.
+  const categoriaId = String(formData.get('categoriaId') ?? '').trim()
+  const predefinida = buscarCategoriaPredefinida(categoriaId)
+  if (!predefinida) throw new Error('Elige una categoría de la lista')
+
+  const { data: existente } = await supabase
+    .from('categorias')
+    .select('id')
+    .eq('negocio_id', negocioId)
+    .eq('nombre', predefinida.es)
+    .maybeSingle()
+  if (existente) throw new Error('Ya tienes esa categoría')
 
   const { data: maxOrden } = await supabase
     .from('categorias')
@@ -186,39 +204,19 @@ export async function createCategoria(formData: FormData) {
 
   const siguienteOrden = (maxOrden?.orden ?? 0) + 1
 
-  const traducciones = traduccionDisponible()
-    ? await traducirAIdiomas(nombre, IDIOMAS_TRADUCIBLES)
-    : {}
-
-  const insercion: Record<string, unknown> = {
+  const { error } = await supabase.from('categorias').insert({
     negocio_id: negocioId,
-    nombre,
+    nombre: predefinida.es,
+    nombre_en: predefinida.en,
+    nombre_de: predefinida.de,
+    nombre_it: predefinida.it,
+    nombre_sv: predefinida.sv,
+    nombre_fr: predefinida.fr,
     orden: siguienteOrden,
-  }
-  for (const [l, texto] of Object.entries(traducciones)) {
-    insercion[`nombre_${l}`] = texto
-  }
-
-  const { error } = await supabase.from('categorias').insert(insercion)
+  })
   if (error) throw new Error('No se pudo crear la categoría')
 
   revalidatePath('/dashboard/categorias')
-}
-
-export async function renameCategoria(categoriaId: number, nombre: string) {
-  const supabase = await createClient()
-  await getOwnedNegocioId(supabase)
-  const nombreLimpio = nombre.trim()
-  if (!nombreLimpio) throw new Error('El nombre es obligatorio')
-
-  const { error } = await supabase
-    .from('categorias')
-    .update({ nombre: nombreLimpio })
-    .eq('id', categoriaId)
-  if (error) throw new Error('No se pudo renombrar la categoría')
-
-  revalidatePath('/dashboard/categorias')
-  revalidatePath('/dashboard')
 }
 
 export async function deleteCategoria(categoriaId: number) {

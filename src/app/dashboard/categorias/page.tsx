@@ -56,7 +56,9 @@ export default async function CategoriasPage() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
         <h2 className="text-sm font-semibold text-slate-900 mb-3">Nueva categoría</h2>
-        <NuevaCategoriaForm />
+        <NuevaCategoriaForm
+          categoriasExistentes={(categorias ?? []).map((c) => c.nombre)}
+        />
       </div>
     </div>
   )
