@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { verificarTurnstile } from '@/lib/turnstile'
 
 function slugify(input: string) {
   return input
@@ -59,4 +60,11 @@ export async function registrarNegocio(nombre: string) {
     throw new Error('No se pudo crear el restaurante')
   }
   throw new Error('No se pudo generar un identificador único para el restaurante')
+}
+
+// Verifica el token de Cloudflare Turnstile (control de bots) antes de
+// dejar avanzar el registro. Se llama desde el cliente justo antes de
+// crear la cuenta con Supabase Auth.
+export async function verificarCaptchaRegistro(token: string | null) {
+  return verificarTurnstile(token)
 }

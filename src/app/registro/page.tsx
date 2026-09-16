@@ -2,9 +2,12 @@
 
 import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { registrarNegocio } from './actions'
+import AuthTabs from '@/components/auth/AuthTabs'
+import TurnstileWidget from '@/components/auth/TurnstileWidget'
+import { registrarNegocio, verificarCaptchaRegistro } from './actions'
+
+const CAPTCHA_ACTIVO = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY)
 
 export default function RegistroPage() {
   const router = useRouter()
@@ -14,11 +17,22 @@ export default function RegistroPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [pendienteEmail, setPendienteEmail] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [captchaVersion, setCaptchaVersion] = useState(0)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
     setLoading(true)
+
+    const captchaOk = await verificarCaptchaRegistro(captchaToken)
+    if (!captchaOk) {
+      setLoading(false)
+      setCaptchaToken(null)
+      setCaptchaVersion((v) => v + 1)
+      setError('No hemos podido verificar que no eres un robot. Inténtalo de nuevo.')
+      return
+    }
 
     const supabase = createClient()
     const nombreLimpio = nombre.trim()
@@ -33,6 +47,8 @@ export default function RegistroPage() {
 
     if (signUpError) {
       setLoading(false)
+      setCaptchaToken(null)
+      setCaptchaVersion((v) => v + 1)
       setError(
         signUpError.message.toLowerCase().includes('already')
           ? 'Ya existe una cuenta con ese email.'
@@ -79,75 +95,73 @@ export default function RegistroPage() {
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-6">
           <span className="flex items-center justify-center h-11 w-11 rounded-xl bg-indigo-600 text-white text-lg font-bold shadow-sm">
-            R
+            C
           </span>
-          <h1 className="mt-3 text-lg font-semibold text-slate-900">Crea tu carta digital</h1>
-          <p className="text-sm text-slate-500">Regístrate y configura tu restaurante</p>
+          <h1 className="mt-3 text-lg font-semibold text-slate-900">Portal de clientes</h1>
+          <p className="text-sm text-slate-500">Crea tu cuenta y digitaliza tu carta</p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8"
-        >
-          <label htmlFor="nombre" className="block text-sm font-medium text-slate-700 mb-1">
-            Nombre del restaurante
-          </label>
-          <input
-            id="nombre"
-            required
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            className="w-full mb-4 rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          />
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+          <AuthTabs activo="registro" />
 
-          <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full mb-4 rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          />
+          <form onSubmit={handleSubmit}>
+            <label htmlFor="nombre" className="block text-sm font-medium text-slate-700 mb-1">
+              Nombre del restaurante
+            </label>
+            <input
+              id="nombre"
+              required
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              className="w-full mb-4 rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            />
 
-          <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
-            Contraseña
-          </label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={6}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full mb-6 rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          />
+            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full mb-4 rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            />
 
-          {error && (
-            <p className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-              {error}
-            </p>
-          )}
+            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
+              Contraseña
+            </label>
+            <input
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              required
+              minLength={6}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full mb-4 rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            />
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white py-3 text-base font-medium shadow-sm transition-colors disabled:opacity-50"
-          >
-            {loading ? 'Creando...' : 'Crear cuenta'}
-          </button>
+            <div className="mb-4">
+              <TurnstileWidget key={captchaVersion} onVerify={setCaptchaToken} />
+            </div>
 
-          <p className="mt-4 text-center text-sm text-slate-500">
-            ¿Ya tienes cuenta?{' '}
-            <Link href="/login" className="text-indigo-600 font-medium hover:underline">
-              Inicia sesión
-            </Link>
-          </p>
-        </form>
+            {error && (
+              <p className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                {error}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading || (CAPTCHA_ACTIVO && !captchaToken)}
+              className="w-full rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white py-3 text-base font-medium shadow-sm transition-colors disabled:opacity-50"
+            >
+              {loading ? 'Creando...' : 'Crear cuenta'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   )

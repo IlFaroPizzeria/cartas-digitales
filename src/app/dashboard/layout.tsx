@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import Nav from "./Nav";
+import Sidebar from "./Sidebar";
 import ToastProvider from "@/components/ui/ToastProvider";
 import { registrarNegocio } from "@/app/registro/actions";
 
@@ -18,7 +18,7 @@ export default async function DashboardLayout({
 
   let { data: negocio } = await supabase
     .from("negocios")
-    .select("nombre, activo")
+    .select("nombre, activo, slug")
     .eq("owner_id", user.id)
     .maybeSingle();
 
@@ -32,7 +32,7 @@ export default async function DashboardLayout({
       await registrarNegocio(nombrePendiente);
       const { data: negocioCreado } = await supabase
         .from("negocios")
-        .select("nombre, activo")
+        .select("nombre, activo, slug")
         .eq("owner_id", user.id)
         .maybeSingle();
       negocio = negocioCreado;
@@ -48,17 +48,23 @@ export default async function DashboardLayout({
   return (
     <ToastProvider>
       <div className="min-h-screen bg-slate-100">
-        <Nav nombreNegocio={negocio?.nombre ?? "Panel"} isAdmin={!!admin} />
-        {negocio && !negocio.activo && (
-          <div className="bg-amber-50 border-b border-amber-200">
-            <div className="max-w-3xl mx-auto px-4 py-2.5 text-sm text-amber-800">
-              Tu carta está pendiente de aprobación. Puedes configurarla
-              mientras tanto — te avisaremos en cuanto esté activa y visible al
-              público.
+        <Sidebar
+          nombreNegocio={negocio?.nombre ?? "Panel"}
+          slug={negocio?.slug ?? null}
+          isAdmin={!!admin}
+        />
+        <div className="lg:pl-64">
+          {negocio && !negocio.activo && (
+            <div className="bg-amber-50 border-b border-amber-200">
+              <div className="max-w-3xl mx-auto px-4 py-2.5 text-sm text-amber-800">
+                Tu carta está pendiente de aprobación. Puedes configurarla
+                mientras tanto — te avisaremos en cuanto esté activa y visible al
+                público.
+              </div>
             </div>
-          </div>
-        )}
-        <main className="max-w-3xl mx-auto px-4 py-6">{children}</main>
+          )}
+          <main className="max-w-3xl mx-auto px-4 py-6 lg:py-8">{children}</main>
+        </div>
       </div>
     </ToastProvider>
   );

@@ -1,0 +1,44 @@
+'use client'
+
+import { useState } from 'react'
+
+export default function CartaLinkCard({ slug }: { slug: string }) {
+  const [copiado, setCopiado] = useState(false)
+  const url = `https://cartoca.es/${slug}`
+
+  async function copiar() {
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopiado(true)
+      setTimeout(() => setCopiado(false), 2000)
+    } catch {
+      // Si el navegador bloquea el portapapeles, el enlace sigue visible
+      // y se puede copiar a mano.
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+      <h2 className="text-sm font-semibold text-slate-900 mb-1">Enlace de tu carta</h2>
+      <p className="text-sm text-slate-500 mb-3">
+        Compártelo con tus clientes o úsalo en tus tarjetas NFC.
+      </p>
+      <div className="flex items-center gap-2">
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 min-w-0 truncate rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-indigo-700 hover:underline"
+        >
+          {url}
+        </a>
+        <button
+          onClick={copiar}
+          className="shrink-0 rounded-lg border border-slate-300 px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+        >
+          {copiado ? 'Copiado ✓' : 'Copiar'}
+        </button>
+      </div>
+    </div>
+  )
+}
