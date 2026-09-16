@@ -1,5 +1,27 @@
 import type { NextConfig } from "next";
 
+const securityHeaders = [
+  // Evita que el navegador intente adivinar el tipo de un archivo servido
+  // (por ejemplo, un logo subido a Storage con la extensión "equivocada").
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  // Nada en la app necesita ir dentro de un <iframe> de otro sitio.
+  { key: 'X-Frame-Options', value: 'DENY' },
+  // No filtra la URL completa (con posibles query params) a sitios externos
+  // cuando el usuario sigue un enlace saliente.
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  // Desactiva por defecto APIs sensibles que la app no usa.
+  {
+    key: 'Permissions-Policy',
+    value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+  },
+  // El dominio solo se sirve por HTTPS; le decimos al navegador que lo
+  // recuerde y no intente nunca HTTP plano.
+  {
+    key: 'Strict-Transport-Security',
+    value: 'max-age=63072000; includeSubDomains; preload',
+  },
+];
+
 const nextConfig: NextConfig = {
   experimental: {
     // Por defecto Next.js limita el cuerpo de una Server Action a 1MB,
@@ -8,6 +30,14 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: '8mb',
     },
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: securityHeaders,
+      },
+    ];
   },
 };
 

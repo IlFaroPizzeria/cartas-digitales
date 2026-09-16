@@ -256,7 +256,28 @@ export async function updateNegocioConfig(formData: FormData) {
 
   const logo = formData.get('logo')
   if (logo instanceof File && logo.size > 0) {
-    const extension = logo.name.split('.').pop() || 'png'
+    const TIPOS_PERMITIDOS = ['image/png', 'image/jpeg', 'image/webp']
+    const MAX_BYTES = 5 * 1024 * 1024 // 5MB
+
+    // Validación server-side del logo subido: el tipo/tamaño que manda el
+    // navegador es solo una pista, así que no nos fiamos únicamente del
+    // límite genérico de la Server Action (que aplica a todo el formulario,
+    // no solo al archivo). Sin esto, cualquiera podría subir un SVG con
+    // <script> dentro (XSS si se abre el enlace directo) o un archivo
+    // enorme a nuestro Storage.
+    if (!TIPOS_PERMITIDOS.includes(logo.type)) {
+      throw new Error('El logo debe ser una imagen PNG, JPG o WEBP')
+    }
+    if (logo.size > MAX_BYTES) {
+      throw new Error('El logo no puede pesar más de 5MB')
+    }
+
+    const extensionesPorTipo: Record<string, string> = {
+      'image/png': 'png',
+      'image/jpeg': 'jpg',
+      'image/webp': 'webp',
+    }
+    const extension = extensionesPorTipo[logo.type]
     const path = `${user.id}/logo-${Date.now()}.${extension}`
 
     // El cliente de servidor (@supabase/ssr) no siempre adjunta bien el
