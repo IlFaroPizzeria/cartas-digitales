@@ -14,6 +14,7 @@ type Props = {
     plan: string | null;
     fecha_pago: string | null;
     owner_id: string | null;
+    idiomas_max_extra: number;
   };
 };
 
@@ -126,6 +127,26 @@ export default function RestauranteForm({ restaurante }: Props) {
               Crea primero la cuenta en Supabase → Authentication → Users, y
               pega aquí su UID para enlazarla. Déjalo vacío para quitar el
               acceso.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Idiomas extra permitidos (además del español)
+            </label>
+            <input
+              name="idiomas_max_extra"
+              type="number"
+              min={0}
+              max={5}
+              defaultValue={restaurante.idiomas_max_extra}
+              className={inputClass}
+            />
+            <p className="mt-1 text-xs text-slate-500">
+              Todos los restaurantes tienen 2 idiomas extra incluidos de
+              base. Si un cliente paga por más, súbelo aquí (hasta 5 en
+              total: inglés, alemán, italiano, sueco y francés) — se queda
+              guardado así hasta que lo vuelvas a cambiar.
             </p>
           </div>
         </>

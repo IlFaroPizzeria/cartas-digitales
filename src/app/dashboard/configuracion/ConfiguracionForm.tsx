@@ -16,6 +16,7 @@ type Negocio = {
   color_acento: string | null;
   logo_url: string | null;
   idiomas_activos: string[] | null;
+  idiomas_max_extra: number;
 };
 
 const IDIOMAS: { id: string; label: string }[] = [
@@ -44,11 +45,31 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
     ),
   );
 
+  const idiomasMaxExtra = negocio.idiomas_max_extra ?? 2;
+
   function toggleIdioma(id: string) {
     setIdiomas((prev) => {
+      if (prev.has(id)) {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      }
+
+      // El español no cuenta para el límite: cada restaurante tiene un
+      // número de idiomas extra que puede activar él mismo (2 de base,
+      // ver /dashboard/cuenta o contacta con nosotros para ampliarlo).
+      if (id !== "es") {
+        const extrasActivos = Array.from(prev).filter((i) => i !== "es").length;
+        if (extrasActivos >= idiomasMaxExtra) {
+          toast.error(
+            `Solo puedes tener ${idiomasMaxExtra} idioma${idiomasMaxExtra === 1 ? "" : "s"} extra activo${idiomasMaxExtra === 1 ? "" : "s"} además del español. Contacta con nosotros si necesitas más.`,
+          );
+          return prev;
+        }
+      }
+
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      next.add(id);
       return next;
     });
   }
@@ -205,21 +226,39 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-2">
+        <label className="block text-sm font-medium text-slate-700 mb-1">
           Idiomas activos
         </label>
+        <p className="text-xs text-slate-500 mb-2">
+          Español incluido siempre, más hasta {idiomasMaxExtra} idioma
+          {idiomasMaxExtra === 1 ? "" : "s"} extra. ¿Necesitas más? Contacta
+          con nosotros.
+        </p>
         <div className="flex flex-wrap gap-2">
           {IDIOMAS.map((idioma) => {
             const activo = idiomas.has(idioma.id);
+            const extrasActivos = Array.from(idiomas).filter(
+              (i) => i !== "es",
+            ).length;
+            const bloqueado =
+              !activo && idioma.id !== "es" && extrasActivos >= idiomasMaxExtra;
             return (
               <button
                 key={idioma.id}
                 type="button"
                 onClick={() => toggleIdioma(idioma.id)}
+                disabled={bloqueado}
+                title={
+                  bloqueado
+                    ? "Límite de idiomas extra alcanzado. Contacta con nosotros para ampliarlo."
+                    : undefined
+                }
                 className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
                   activo
                     ? "bg-indigo-50 text-indigo-700 border-indigo-300"
-                    : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
+                    : bloqueado
+                      ? "bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed"
+                      : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
                 }`}
               >
                 {idioma.label}

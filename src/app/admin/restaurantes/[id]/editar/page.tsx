@@ -12,7 +12,7 @@ export default async function EditarRestaurantePage({
 
   const { data: restaurante } = await supabase
     .from('negocios')
-    .select('id, nombre, slug, activo, plan, fecha_pago, owner_id')
+    .select('id, nombre, slug, activo, plan, fecha_pago, owner_id, idiomas_max_extra')
     .eq('id', id)
     .single()
 

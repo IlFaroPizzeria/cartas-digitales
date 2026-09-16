@@ -291,6 +291,23 @@ export async function updateNegocioConfig(formData: FormData) {
   if (!nombre) throw new Error('El nombre es obligatorio')
   if (idiomas_activos.length === 0) throw new Error('Activa al menos un idioma')
 
+  // El español no cuenta para el límite: cada restaurante tiene un número
+  // de idiomas extra (además del español) que puede activar él mismo,
+  // controlado desde el panel de admin. Si quiere más, tiene que pedirlo
+  // y se le amplía desde ahí -- nunca lo puede subir él por su cuenta.
+  const idiomasExtra = idiomas_activos.filter((l) => l !== 'es')
+  const { data: limite } = await supabase
+    .from('negocios')
+    .select('idiomas_max_extra')
+    .eq('id', negocioId)
+    .single()
+  const maxExtra = limite?.idiomas_max_extra ?? 2
+  if (idiomasExtra.length > maxExtra) {
+    throw new Error(
+      `Solo puedes tener ${maxExtra} idioma${maxExtra === 1 ? '' : 's'} extra activo${maxExtra === 1 ? '' : 's'} además del español. Contacta con nosotros si necesitas más.`
+    )
+  }
+
   const update: Record<string, unknown> = {
     nombre,
     tagline,

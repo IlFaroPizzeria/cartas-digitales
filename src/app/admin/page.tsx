@@ -8,7 +8,7 @@ export default async function AdminPage() {
 
   const { data: negocios } = await supabase
     .from("negocios")
-    .select("id, nombre, slug, activo, plan, owner_id")
+    .select("id, nombre, slug, activo, plan, owner_id, idiomas_max_extra")
     .order("id", { ascending: true });
 
   return (
@@ -66,6 +66,9 @@ export default async function AdminPage() {
                   {n.plan}
                 </span>
               )}
+              <span className="text-xs font-medium px-2.5 py-1 rounded-full border border-slate-200 text-slate-600">
+                +{n.idiomas_max_extra ?? 2} idiomas
+              </span>
               {!n.activo && n.owner_id && (
                 <ActivarButton id={n.id} nombre={n.nombre} />
               )}
