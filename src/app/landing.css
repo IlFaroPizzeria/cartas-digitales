@@ -336,6 +336,33 @@
   .landing .founder-bio{font-size:16.5px;line-height:1.7;color:var(--ink-soft);max-width:64ch;}
   .landing .founder-cta{margin-top:22px;}
 
+  /* Equipo / esencia (página Sobre nosotros): bloques de texto simples,
+     visualmente distintos de la tarjeta del fundador (sin avatar ni
+     grid), para no repetir el mismo formato dos veces en la misma página. */
+  .landing .team-block,.landing .essence-block{max-width:680px;}
+  .landing .team-block h2,.landing .essence-block h2{font-size:clamp(21px,2.4vw,27px);margin-top:10px;margin-bottom:14px;}
+  .landing .team-block p,.landing .essence-block p{font-size:15.5px;line-height:1.7;color:var(--ink-soft);}
+  .landing .essence-block{border-left:3px solid var(--accent);padding-left:26px;}
+
+  /* Nota compacta del equipo en /contacto: mismo mensaje que "Sobre
+     nosotros" pero en un formato mucho más corto, pensado para no repetir
+     la tarjeta grande del fundador dos veces en la web. */
+  .landing .contact-team-note{
+    display:flex;align-items:flex-start;gap:14px;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-m);
+    padding:22px 24px;
+  }
+  .landing .contact-team-note .ctn-avatar{
+    flex:none;width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(155deg,var(--accent) 0%,var(--accent-dark) 100%);color:var(--on-accent);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-weight:600;font-size:13px;
+  }
+  .landing .contact-team-note p{font-size:14px;line-height:1.6;color:var(--ink-soft);margin:0;}
+  .landing .contact-team-note strong{color:var(--ink);}
+  .landing .contact-team-note a{color:var(--accent);font-weight:600;}
+  .landing .contact-team-note a:hover{color:var(--accent-dark);}
+
   /* ---------- FAQ ---------- */
   .landing .faq-list{border-top:1px solid var(--line);}
   .landing details{border-bottom:1px solid var(--line);}

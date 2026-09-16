@@ -30,7 +30,7 @@ export default function LandingFooter() {
             <Link href="/contacto">Solicitar presupuesto</Link>
             <a href="mailto:hola@cartoca.es">hola@cartoca.es</a>
             <Link href="/preguntas">Preguntas frecuentes</Link>
-            <Link href="/quienes-somos">Quiénes somos</Link>
+            <Link href="/quienes-somos">Sobre nosotros</Link>
           </div>
         </div>
       </div>

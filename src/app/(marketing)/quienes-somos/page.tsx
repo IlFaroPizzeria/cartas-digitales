@@ -9,9 +9,9 @@ const bodyHtml = fs.readFileSync(
 )
 
 export const metadata: Metadata = {
-  title: 'Quiénes somos | Cartoca',
+  title: 'Sobre nosotros | Cartoca',
   description:
-    'Cartoca la lleva una sola persona, de principio a fin. Conoce a Nils Lehmann, fundador y CEO.',
+    'Cartoca la construye Nils Lehmann, con la ayuda de un pequeño equipo de amigos en ventas. Conoce la esencia del proyecto.',
 }
 
 export default function QuienesSomosPage() {

@@ -7,6 +7,7 @@ import { useState } from "react";
 const LINKS = [
   { href: "/producto", label: "Producto" },
   { href: "/precios", label: "Precios" },
+  { href: "/quienes-somos", label: "Sobre nosotros" },
   { href: "/preguntas", label: "Preguntas" },
   { href: "/contacto", label: "Contacto" },
 ];
