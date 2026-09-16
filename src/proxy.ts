@@ -1,10 +1,10 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
-// Este middleware SOLO se ejecuta en /login y /dashboard (ver matcher).
-// La carta pública (/[slug]) nunca pasa por aquí, así que no puede
-// romperla: se limita a mantener la sesión del restaurante actualizada.
-export async function middleware(request: NextRequest) {
+// Este proxy (antes middleware.ts) SOLO se ejecuta en /login y /dashboard
+// (ver matcher). La carta pública (/[slug]) nunca pasa por aquí, así que no
+// puede romperla: se limita a mantener la sesión del restaurante actualizada.
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
