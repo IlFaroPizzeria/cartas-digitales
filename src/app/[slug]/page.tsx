@@ -55,9 +55,16 @@ export default async function CartaDigital({
 }) {
   const { slug } = await params
 
+  // Solo las columnas que de verdad necesita la carta pública. El
+  // resto (plan, fecha_pago, owner_id, idiomas_max_extra) son datos de
+  // gestión de cuenta que no deben poder leerse desde la API pública
+  // (esta página usa la clave anon, visible en el bundle del navegador).
+  // Además de esto, en Supabase hay que quitarle a `anon` el permiso de
+  // SELECT sobre el resto de columnas, por si alguien consulta la API
+  // directamente en vez de pasar por esta página.
   const { data: negocio } = await supabase
     .from('negocios')
-    .select('*')
+    .select('id, nombre, slug, activo, tagline, telefono, email, direccion, color_fondo, color_header, color_acento, logo_url, idiomas_activos')
     .eq('slug', slug)
     .single()
 
