@@ -104,10 +104,26 @@ function NavLinks({ isAdmin }: { isAdmin: boolean }) {
           </Link>
         )
       })}
+      <Link
+        href="/dashboard/estadisticas"
+        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors mt-2 border-t border-slate-100 pt-4 ${
+          pathname.startsWith("/dashboard/estadisticas")
+            ? "text-indigo-700"
+            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+        }`}
+      >
+        <span className={`h-5 w-5 shrink-0 ${pathname.startsWith("/dashboard/estadisticas") ? "text-indigo-600" : "text-slate-400"}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 19V5M10 19V9M16 19v-6M22 19H2" />
+          </svg>
+        </span>
+        Estadísticas
+      </Link>
+
       {isAdmin && (
         <Link
           href="/admin"
-          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 mt-2 border-t border-slate-100 pt-4"
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 mt-2"
         >
           <span className="h-5 w-5 shrink-0 text-slate-400">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">

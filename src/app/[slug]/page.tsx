@@ -136,6 +136,7 @@ export default async function CartaDigital({
     <div className={`${fraunces.variable} ${publicSans.variable}`} style={{ fontFamily: 'var(--font-body)' }}>
       <CartaClient
         negocio={{
+          id: negocio.id,
           nombre: negocio.nombre,
           tagline: negocio.tagline,
           telefono: negocio.telefono,

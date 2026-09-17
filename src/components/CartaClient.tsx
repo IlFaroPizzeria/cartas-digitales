@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { etiquetaPorId } from "@/lib/etiquetas";
+import { registrarVisita } from "@/lib/visitas";
 
 type Plato = {
   id: number;
@@ -28,6 +29,7 @@ type Plato = {
 };
 
 type Negocio = {
+  id: number;
   nombre: string;
   tagline: string | null;
   telefono: string | null;
@@ -113,6 +115,22 @@ export default function CartaClient({
       : ["es"];
 
   const [lang, setLang] = useState<Lang>(idiomasActivos[0] || "es");
+
+  // Registra la apertura de la carta (primera vez que se monta el
+  // componente) y, después, cada cambio de idioma que haga el cliente
+  // -- así el restaurante puede ver cuánto se usa su carta y en qué
+  // idiomas, desde src/app/dashboard/estadisticas. Si esto falla nunca
+  // rompe nada, ver src/lib/visitas.ts.
+  const esPrimeraCarga = useRef(true);
+  useEffect(() => {
+    if (esPrimeraCarga.current) {
+      esPrimeraCarga.current = false;
+      registrarVisita(negocio.id, lang, "apertura");
+    } else {
+      registrarVisita(negocio.id, lang, "idioma");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   const colorFondo = negocio.color_fondo || "#faf5ec";
   const colorHeader = negocio.color_header || "#101b2d";
