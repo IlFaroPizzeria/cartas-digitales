@@ -57,19 +57,19 @@ const LINKS = [
 
 function BrandBlock({ nombreNegocio, slug }: { nombreNegocio: string; slug: string | null }) {
   return (
-    <div className="px-5 pt-5 pb-4 border-b border-slate-200">
+    <div className="px-5 pt-5 pb-4 border-b border-slate-800">
       <div className="flex items-center gap-2.5 min-w-0">
-        <span className="flex items-center justify-center h-9 w-9 rounded-lg bg-indigo-600 text-white text-sm font-semibold shrink-0">
+        <span className="flex items-center justify-center h-9 w-9 rounded-lg bg-indigo-500 text-white text-sm font-semibold shrink-0">
           {nombreNegocio.charAt(0).toUpperCase() || 'R'}
         </span>
-        <span className="text-sm font-semibold text-slate-900 truncate">{nombreNegocio}</span>
+        <span className="text-sm font-semibold text-white truncate">{nombreNegocio}</span>
       </div>
       {slug && (
         <a
           href={`https://cartoca.es/${slug}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-3 flex items-center gap-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-700"
+          className="mt-3 flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300"
         >
           Ver mi carta pública
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
@@ -93,11 +93,11 @@ function NavLinks({ isAdmin }: { isAdmin: boolean }) {
             href={link.href}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
               active
-                ? 'bg-indigo-50 text-indigo-700'
-                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                ? 'bg-slate-800 text-white'
+                : 'text-slate-400 hover:bg-slate-800/60 hover:text-white'
             }`}
           >
-            <span className={`h-5 w-5 shrink-0 ${active ? 'text-indigo-600' : 'text-slate-400'}`}>
+            <span className={`h-5 w-5 shrink-0 ${active ? 'text-indigo-400' : 'text-slate-500'}`}>
               {link.icon}
             </span>
             {link.label}
@@ -106,13 +106,13 @@ function NavLinks({ isAdmin }: { isAdmin: boolean }) {
       })}
       <Link
         href="/dashboard/estadisticas"
-        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors mt-2 border-t border-slate-100 pt-4 ${
+        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors mt-2 border-t border-slate-800 pt-4 ${
           pathname.startsWith("/dashboard/estadisticas")
-            ? "text-indigo-700"
-            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+            ? "bg-slate-800 text-white"
+            : "text-slate-400 hover:bg-slate-800/60 hover:text-white"
         }`}
       >
-        <span className={`h-5 w-5 shrink-0 ${pathname.startsWith("/dashboard/estadisticas") ? "text-indigo-600" : "text-slate-400"}`}>
+        <span className={`h-5 w-5 shrink-0 ${pathname.startsWith("/dashboard/estadisticas") ? "text-indigo-400" : "text-slate-500"}`}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 19V5M10 19V9M16 19v-6M22 19H2" />
           </svg>
@@ -123,9 +123,9 @@ function NavLinks({ isAdmin }: { isAdmin: boolean }) {
       {isAdmin && (
         <Link
           href="/admin"
-          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 mt-2"
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white mt-2"
         >
-          <span className="h-5 w-5 shrink-0 text-slate-400">
+          <span className="h-5 w-5 shrink-0 text-slate-500">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 3 4 6.5v5c0 4.7 3.2 8.4 8 9.5 4.8-1.1 8-4.8 8-9.5v-5L12 3Z" />
             </svg>
@@ -143,7 +143,7 @@ function BottomNav() {
   const pathname = usePathname()
   return (
     <nav
-      className="lg:hidden fixed inset-x-0 bottom-0 z-30 bg-white border-t border-slate-200"
+      className="lg:hidden fixed inset-x-0 bottom-0 z-30 bg-slate-900 border-t border-slate-800"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="grid grid-cols-4">
@@ -155,12 +155,12 @@ function BottomNav() {
               href={link.href}
               className="flex flex-col items-center justify-center gap-0.5 py-2 min-w-0"
             >
-              <span className={`h-5 w-5 shrink-0 ${active ? 'text-indigo-600' : 'text-slate-400'}`}>
+              <span className={`h-5 w-5 shrink-0 ${active ? 'text-indigo-400' : 'text-slate-500'}`}>
                 {link.icon}
               </span>
               <span
                 className={`text-[10.5px] font-medium leading-tight truncate max-w-full px-0.5 ${
-                  active ? 'text-indigo-600' : 'text-slate-500'
+                  active ? 'text-indigo-400' : 'text-slate-500'
                 }`}
               >
                 {link.mobileLabel}
@@ -185,10 +185,10 @@ export default function Sidebar({
   return (
     <>
       {/* Sidebar fija en escritorio */}
-      <aside className="hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 lg:bg-white lg:border-r lg:border-slate-200 lg:z-20">
+      <aside className="hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 lg:bg-slate-900 lg:border-r lg:border-slate-800 lg:z-20">
         <BrandBlock nombreNegocio={nombreNegocio} slug={slug} />
         <NavLinks isAdmin={isAdmin} />
-        <div className="px-3 py-4 border-t border-slate-100">
+        <div className="px-3 py-4 border-t border-slate-800">
           <LogoutButton />
         </div>
       </aside>
@@ -196,13 +196,13 @@ export default function Sidebar({
       {/* Cabecera compacta en móvil: marca + accesos rápidos. La navegación
           principal vive en la barra de pestañas de abajo (BottomNav), no
           aquí, para que nunca quede escondida en un menú. */}
-      <header className="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200">
+      <header className="lg:hidden sticky top-0 z-30 bg-slate-900 border-b border-slate-800">
         <div className="flex items-center justify-between h-14 px-4">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="flex items-center justify-center h-8 w-8 rounded-lg bg-indigo-600 text-white text-sm font-semibold shrink-0">
+            <span className="flex items-center justify-center h-8 w-8 rounded-lg bg-indigo-500 text-white text-sm font-semibold shrink-0">
               {nombreNegocio.charAt(0).toUpperCase() || 'R'}
             </span>
-            <span className="text-sm font-semibold text-slate-900 truncate">{nombreNegocio}</span>
+            <span className="text-sm font-semibold text-white truncate">{nombreNegocio}</span>
           </div>
           <div className="flex items-center gap-0.5 shrink-0">
             {slug && (
@@ -212,7 +212,7 @@ export default function Sidebar({
                 rel="noopener noreferrer"
                 aria-label="Ver mi carta pública"
                 title="Ver mi carta pública"
-                className="flex items-center justify-center h-9 w-9 rounded-lg text-slate-500 hover:bg-slate-100"
+                className="flex items-center justify-center h-9 w-9 rounded-lg text-slate-400 hover:bg-white/10 hover:text-white"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
                   <path d="M7 17 17 7M8 7h9v9" />
@@ -224,7 +224,7 @@ export default function Sidebar({
                 href="/admin"
                 aria-label="Panel admin"
                 title="Panel admin"
-                className="flex items-center justify-center h-9 w-9 rounded-lg text-slate-500 hover:bg-slate-100"
+                className="flex items-center justify-center h-9 w-9 rounded-lg text-slate-400 hover:bg-white/10 hover:text-white"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
                   <path d="M12 3 4 6.5v5c0 4.7 3.2 8.4 8 9.5 4.8-1.1 8-4.8 8-9.5v-5L12 3Z" />

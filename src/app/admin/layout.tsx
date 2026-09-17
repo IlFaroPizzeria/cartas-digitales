@@ -27,27 +27,27 @@ export default async function AdminLayout({
   return (
     <ToastProvider>
       <div className="min-h-screen bg-slate-100">
-        <header className="sticky top-0 z-10 bg-white border-b border-slate-200">
+        <header className="sticky top-0 z-10 bg-slate-900 border-b border-slate-800">
           <div className="max-w-4xl mx-auto px-4">
             <div className="flex items-center justify-between h-14">
               <div className="flex items-center gap-2 min-w-0">
-                <span className="flex items-center justify-center h-8 w-8 rounded-lg bg-slate-900 text-white text-sm font-semibold shrink-0">
+                <span className="flex items-center justify-center h-8 w-8 rounded-lg bg-indigo-500 text-white text-sm font-semibold shrink-0">
                   A
                 </span>
-                <span className="text-sm font-semibold text-slate-900 truncate">
+                <span className="text-sm font-semibold text-white truncate">
                   Panel de administrador
                 </span>
               </div>
               <div className="flex items-center gap-4 shrink-0">
                 <Link
                   href="/admin/auditoria"
-                  className="text-sm font-medium text-slate-500 hover:text-slate-900"
+                  className="text-sm font-medium text-slate-400 hover:text-white"
                 >
                   Auditoría
                 </Link>
                 <Link
                   href="/dashboard"
-                  className="text-sm font-medium text-slate-500 hover:text-slate-900"
+                  className="text-sm font-medium text-slate-400 hover:text-white"
                 >
                   Mi restaurante
                 </Link>
