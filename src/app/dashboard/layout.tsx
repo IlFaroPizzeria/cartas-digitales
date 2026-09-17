@@ -52,6 +52,8 @@ export default async function DashboardLayout({
           nombreNegocio={negocio?.nombre ?? "Panel"}
           slug={negocio?.slug ?? null}
           isAdmin={!!admin}
+          activo={negocio?.activo ?? null}
+          suspendido={negocio?.suspendido ?? false}
         />
         <div className="lg:pl-64">
           {negocio && negocio.suspendido ? (
@@ -74,7 +76,7 @@ export default async function DashboardLayout({
               </div>
             )
           )}
-          <main className="max-w-3xl mx-auto px-4 pt-6 pb-28 lg:pt-8 lg:pb-8">
+          <main className="max-w-3xl mx-auto px-4 pt-6 pb-32 lg:pt-8 lg:pb-8">
             {children}
           </main>
         </div>
