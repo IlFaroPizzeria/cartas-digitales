@@ -1,5 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
+import { cache } from 'react'
+import type { Metadata } from 'next'
 import { Fraunces, Public_Sans } from 'next/font/google'
 import CartaClient from '@/components/CartaClient'
 
@@ -48,25 +50,52 @@ type PlatoConCategoriaRaw = {
   } | null
 }
 
+// Solo las columnas que de verdad necesita la carta pública. El resto
+// (plan, fecha_pago, owner_id, idiomas_max_extra) son datos de gestión
+// de cuenta que no deben poder leerse desde la API pública (esta página
+// usa la clave anon, visible en el bundle del navegador). Además de
+// esto, en Supabase hay que quitarle a `anon` el permiso de SELECT
+// sobre el resto de columnas, por si alguien consulta la API
+// directamente en vez de pasar por esta página.
+//
+// Envuelta en cache() para que generateMetadata (favicon/título por
+// restaurante) y la página en sí compartan una sola consulta a
+// Supabase por request, en vez de duplicarla.
+const getNegocio = cache(async (slug: string) => {
+  const { data } = await supabase
+    .from('negocios')
+    .select('id, nombre, slug, activo, suspendido, tagline, telefono, email, direccion, color_fondo, color_header, color_acento, logo_url, idiomas_activos')
+    .eq('slug', slug)
+    .single()
+  return data
+})
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const negocio = await getNegocio(slug)
+
+  if (!negocio) return {}
+
+  return {
+    title: negocio.nombre,
+    // Si el restaurante no tiene logo propio, no seteamos `icons`: así
+    // hereda el favicon por defecto de Cartoca (src/app/icon.svg) en
+    // vez de quedarse sin icono.
+    ...(negocio.logo_url ? { icons: { icon: negocio.logo_url } } : {}),
+  }
+}
+
 export default async function CartaDigital({
   params,
 }: {
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-
-  // Solo las columnas que de verdad necesita la carta pública. El
-  // resto (plan, fecha_pago, owner_id, idiomas_max_extra) son datos de
-  // gestión de cuenta que no deben poder leerse desde la API pública
-  // (esta página usa la clave anon, visible en el bundle del navegador).
-  // Además de esto, en Supabase hay que quitarle a `anon` el permiso de
-  // SELECT sobre el resto de columnas, por si alguien consulta la API
-  // directamente en vez de pasar por esta página.
-  const { data: negocio } = await supabase
-    .from('negocios')
-    .select('id, nombre, slug, activo, suspendido, tagline, telefono, email, direccion, color_fondo, color_header, color_acento, logo_url, idiomas_activos')
-    .eq('slug', slug)
-    .single()
+  const negocio = await getNegocio(slug)
 
   if (!negocio) {
     notFound()
