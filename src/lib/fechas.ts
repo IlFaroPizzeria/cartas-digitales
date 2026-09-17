@@ -5,3 +5,7 @@
 export function isoHaceDias(dias: number): string {
   return new Date(Date.now() - dias * 24 * 60 * 60 * 1000).toISOString()
 }
+
+export function formatearFechaHora(iso: string): string {
+  return new Date(iso).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' })
+}

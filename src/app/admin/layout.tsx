@@ -40,6 +40,12 @@ export default async function AdminLayout({
               </div>
               <div className="flex items-center gap-4 shrink-0">
                 <Link
+                  href="/admin/auditoria"
+                  className="text-sm font-medium text-slate-500 hover:text-slate-900"
+                >
+                  Auditoría
+                </Link>
+                <Link
                   href="/dashboard"
                   className="text-sm font-medium text-slate-500 hover:text-slate-900"
                 >

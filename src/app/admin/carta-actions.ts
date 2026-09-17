@@ -14,6 +14,11 @@
 // funcionan si en Supabase existen políticas que dejen a los usuarios
 // de la tabla `admins` leer/escribir en `categorias` y `platos` de
 // cualquier negocio (ver instrucciones dadas al usuario).
+//
+// Cada creación/edición/borrado deja un rastro en `admin_auditoria`
+// (quién, en qué restaurante, qué hizo) -- se puede ver en
+// /admin/auditoria. Los simples reordenamientos (mover arriba/abajo)
+// no se registran, para no llenar el log de ruido.
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
@@ -23,7 +28,7 @@ import { buscarCategoriaPredefinida, traduccionesPorNombreEs } from '@/lib/categ
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>
 
-async function requireAdmin(): Promise<SupabaseClient> {
+async function requireAdmin(): Promise<{ supabase: SupabaseClient; email: string }> {
   const supabase = await createClient()
   const {
     data: { user },
@@ -37,7 +42,33 @@ async function requireAdmin(): Promise<SupabaseClient> {
     .maybeSingle()
 
   if (!admin) throw new Error('No autorizado')
-  return supabase
+  return { supabase, email: user.email ?? user.id }
+}
+
+// Nunca debe romper la acción real que la llama -- si falla el log,
+// falla en silencio, la edición de la carta ya se hizo igualmente.
+async function registrarAuditoria(
+  supabase: SupabaseClient,
+  email: string,
+  negocioId: number,
+  accion: string,
+) {
+  try {
+    const { data: negocio } = await supabase
+      .from('negocios')
+      .select('nombre')
+      .eq('id', negocioId)
+      .maybeSingle()
+
+    await supabase.from('admin_auditoria').insert({
+      admin_email: email,
+      negocio_id: negocioId,
+      negocio_nombre: negocio?.nombre ?? 'Restaurante',
+      accion,
+    })
+  } catch {
+    // Sin registro esta vez, pero la acción real ya se aplicó.
+  }
 }
 
 async function findOrCreateCategoriaAdmin(
@@ -82,25 +113,50 @@ async function findOrCreateCategoriaAdmin(
 }
 
 export async function adminToggleDisponible(platoId: number, disponible: boolean) {
-  const supabase = await requireAdmin()
+  const { supabase, email } = await requireAdmin()
+
+  const { data: plato } = await supabase
+    .from('platos')
+    .select('nombre, negocio_id')
+    .eq('id', platoId)
+    .maybeSingle()
 
   const { error } = await supabase.from('platos').update({ disponible }).eq('id', platoId)
   if (error) throw new Error('No se pudo actualizar la disponibilidad')
+
+  if (plato) {
+    await registrarAuditoria(
+      supabase,
+      email,
+      plato.negocio_id,
+      `Marcó "${plato.nombre}" como ${disponible ? 'disponible' : 'no disponible'}`,
+    )
+  }
 
   revalidatePath('/admin', 'layout')
 }
 
 export async function adminDeletePlato(platoId: number) {
-  const supabase = await requireAdmin()
+  const { supabase, email } = await requireAdmin()
+
+  const { data: plato } = await supabase
+    .from('platos')
+    .select('nombre, negocio_id')
+    .eq('id', platoId)
+    .maybeSingle()
 
   const { error } = await supabase.from('platos').delete().eq('id', platoId)
   if (error) throw new Error('No se pudo eliminar el plato')
+
+  if (plato) {
+    await registrarAuditoria(supabase, email, plato.negocio_id, `Eliminó el plato "${plato.nombre}"`)
+  }
 
   revalidatePath('/admin', 'layout')
 }
 
 export async function adminMovePlato(platoId: number, direccion: 'arriba' | 'abajo') {
-  const supabase = await requireAdmin()
+  const { supabase } = await requireAdmin()
 
   const { data: plato } = await supabase
     .from('platos')
@@ -135,7 +191,7 @@ export async function adminMovePlato(platoId: number, direccion: 'arriba' | 'aba
 }
 
 export async function adminSavePlato(negocioId: number, formData: FormData) {
-  const supabase = await requireAdmin()
+  const { supabase, email } = await requireAdmin()
 
   const id = formData.get('id') ? Number(formData.get('id')) : null
   const nombre = String(formData.get('nombre') ?? '').trim()
@@ -193,6 +249,7 @@ export async function adminSavePlato(negocioId: number, formData: FormData) {
       .eq('id', id)
       .eq('negocio_id', negocioId)
     if (error) throw new Error('No se pudo guardar el plato')
+    await registrarAuditoria(supabase, email, negocioId, `Editó el plato "${nombre}"`)
   } else {
     const { error } = await supabase.from('platos').insert({
       negocio_id: negocioId,
@@ -207,13 +264,14 @@ export async function adminSavePlato(negocioId: number, formData: FormData) {
       ...traducciones,
     })
     if (error) throw new Error('No se pudo crear el plato')
+    await registrarAuditoria(supabase, email, negocioId, `Creó el plato "${nombre}"`)
   }
 
   revalidatePath('/admin', 'layout')
 }
 
 export async function adminCreateCategoria(negocioId: number, formData: FormData) {
-  const supabase = await requireAdmin()
+  const { supabase, email } = await requireAdmin()
 
   const categoriaId = String(formData.get('categoriaId') ?? '').trim()
   const nombrePersonalizado = String(formData.get('nombre') ?? '').trim()
@@ -264,11 +322,19 @@ export async function adminCreateCategoria(negocioId: number, formData: FormData
   })
   if (error) throw new Error('No se pudo crear la categoría')
 
+  await registrarAuditoria(supabase, email, negocioId, `Creó la categoría "${nombre}"`)
+
   revalidatePath('/admin', 'layout')
 }
 
 export async function adminDeleteCategoria(categoriaId: number) {
-  const supabase = await requireAdmin()
+  const { supabase, email } = await requireAdmin()
+
+  const { data: categoria } = await supabase
+    .from('categorias')
+    .select('nombre, negocio_id')
+    .eq('id', categoriaId)
+    .maybeSingle()
 
   const { count } = await supabase
     .from('platos')
@@ -282,11 +348,15 @@ export async function adminDeleteCategoria(categoriaId: number) {
   const { error } = await supabase.from('categorias').delete().eq('id', categoriaId)
   if (error) throw new Error('No se pudo eliminar la categoría')
 
+  if (categoria) {
+    await registrarAuditoria(supabase, email, categoria.negocio_id, `Eliminó la categoría "${categoria.nombre}"`)
+  }
+
   revalidatePath('/admin', 'layout')
 }
 
 export async function adminMoveCategoria(categoriaId: number, direccion: 'arriba' | 'abajo') {
-  const supabase = await requireAdmin()
+  const { supabase } = await requireAdmin()
 
   const { data: categoria } = await supabase
     .from('categorias')
