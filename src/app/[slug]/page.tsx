@@ -64,7 +64,7 @@ export default async function CartaDigital({
   // directamente en vez de pasar por esta página.
   const { data: negocio } = await supabase
     .from('negocios')
-    .select('id, nombre, slug, activo, tagline, telefono, email, direccion, color_fondo, color_header, color_acento, logo_url, idiomas_activos')
+    .select('id, nombre, slug, activo, suspendido, tagline, telefono, email, direccion, color_fondo, color_header, color_acento, logo_url, idiomas_activos')
     .eq('slug', slug)
     .single()
 
@@ -72,7 +72,10 @@ export default async function CartaDigital({
     notFound()
   }
 
-  if (!negocio.activo) {
+  // Suspendido por impago cuenta igual que inactivo de cara al público,
+  // pero es un interruptor aparte que controla solo el admin (ver
+  // src/app/dashboard/actions.ts para el bloqueo del lado del dueño).
+  if (!negocio.activo || negocio.suspendido) {
     return (
       <div
         className="min-h-screen flex items-center justify-center px-6 text-center"

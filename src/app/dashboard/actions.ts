@@ -24,11 +24,24 @@ async function getOwnedNegocioId(supabase: SupabaseClient) {
 
   const { data: negocio } = await supabase
     .from('negocios')
-    .select('id')
+    .select('id, suspendido')
     .eq('owner_id', user.id)
     .single()
 
   if (!negocio) throw new Error('Este usuario no tiene un restaurante asociado')
+
+  // Cuenta suspendida (impago) desde el panel admin: se corta aquí, en el
+  // único sitio por el que pasan todas las mutaciones del dueño (guardar
+  // platos, categorías, configuración...), así que basta este chequeo
+  // para bloquearlas todas de golpe. No afecta a "activo" -- eso solo
+  // controla si la carta pública se ve, y un restaurante pendiente de
+  // aprobación (activo = false) debe poder seguir montando su carta.
+  if (negocio.suspendido) {
+    throw new Error(
+      'Tu cuenta está suspendida por impago. Contacta con nosotros para reactivarla.',
+    )
+  }
+
   return negocio.id
 }
 

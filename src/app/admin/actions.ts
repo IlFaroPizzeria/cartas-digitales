@@ -73,6 +73,7 @@ export async function updateRestaurante(formData: FormData) {
   const nombre = String(formData.get("nombre") ?? "").trim();
   const slug = slugify(String(formData.get("slug") ?? "").trim());
   const activo = formData.get("activo") === "on";
+  const suspendido = formData.get("suspendido") === "on";
   const plan = String(formData.get("plan") ?? "").trim() || null;
   const fechaPago = String(formData.get("fecha_pago") ?? "").trim() || null;
   const ownerId = String(formData.get("owner_id") ?? "").trim() || null;
@@ -99,6 +100,7 @@ export async function updateRestaurante(formData: FormData) {
       nombre,
       slug,
       activo,
+      suspendido,
       plan,
       fecha_pago: fechaPago,
       owner_id: ownerId,

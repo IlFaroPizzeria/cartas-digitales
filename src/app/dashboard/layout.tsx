@@ -18,7 +18,7 @@ export default async function DashboardLayout({
 
   let { data: negocio } = await supabase
     .from("negocios")
-    .select("nombre, activo, slug")
+    .select("nombre, activo, slug, suspendido")
     .eq("owner_id", user.id)
     .maybeSingle();
 
@@ -32,7 +32,7 @@ export default async function DashboardLayout({
       await registrarNegocio(nombrePendiente);
       const { data: negocioCreado } = await supabase
         .from("negocios")
-        .select("nombre, activo, slug")
+        .select("nombre, activo, slug, suspendido")
         .eq("owner_id", user.id)
         .maybeSingle();
       negocio = negocioCreado;
@@ -54,14 +54,25 @@ export default async function DashboardLayout({
           isAdmin={!!admin}
         />
         <div className="lg:pl-64">
-          {negocio && !negocio.activo && (
-            <div className="bg-amber-50 border-b border-amber-200">
-              <div className="max-w-3xl mx-auto px-4 py-2.5 text-sm text-amber-800">
-                Tu carta está pendiente de aprobación. Puedes configurarla
-                mientras tanto — te avisaremos en cuanto esté activa y visible al
-                público.
+          {negocio && negocio.suspendido ? (
+            <div className="bg-red-50 border-b border-red-200">
+              <div className="max-w-3xl mx-auto px-4 py-2.5 text-sm text-red-800">
+                Tu cuenta está suspendida por impago. Tu carta pública no se ve
+                y no se pueden guardar cambios hasta que se regularice — contacta
+                con nosotros.
               </div>
             </div>
+          ) : (
+            negocio &&
+            !negocio.activo && (
+              <div className="bg-amber-50 border-b border-amber-200">
+                <div className="max-w-3xl mx-auto px-4 py-2.5 text-sm text-amber-800">
+                  Tu carta está pendiente de aprobación. Puedes configurarla
+                  mientras tanto — te avisaremos en cuanto esté activa y visible
+                  al público.
+                </div>
+              </div>
+            )
           )}
           <main className="max-w-3xl mx-auto px-4 pt-6 pb-28 lg:pt-8 lg:pb-8">
             {children}

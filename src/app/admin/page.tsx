@@ -8,7 +8,7 @@ export default async function AdminPage() {
 
   const { data: negocios } = await supabase
     .from("negocios")
-    .select("id, nombre, slug, activo, plan, owner_id, idiomas_max_extra")
+    .select("id, nombre, slug, activo, suspendido, plan, owner_id, idiomas_max_extra")
     .order("id", { ascending: true });
 
   return (
@@ -41,6 +41,11 @@ export default async function AdminPage() {
               <p className="text-sm text-slate-500">/{n.slug}</p>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
+              {n.suspendido && (
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full border bg-red-50 text-red-700 border-red-200">
+                  Suspendido
+                </span>
+              )}
               <span
                 className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
                   n.activo

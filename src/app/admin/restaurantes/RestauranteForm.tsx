@@ -11,6 +11,7 @@ type Props = {
     nombre: string;
     slug: string;
     activo: boolean;
+    suspendido: boolean;
     plan: string | null;
     fecha_pago: string | null;
     owner_id: string | null;
@@ -89,6 +90,24 @@ export default function RestauranteForm({ restaurante }: Props) {
             />
             Restaurante activo (visible en su carta pública)
           </label>
+
+          <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+            <label className="flex items-center gap-2 text-sm font-medium text-red-800">
+              <input
+                type="checkbox"
+                name="suspendido"
+                defaultChecked={restaurante.suspendido}
+                className="h-4 w-4 rounded border-red-300 text-red-600 focus:ring-red-500"
+              />
+              Suspendido por impago
+            </label>
+            <p className="mt-1 text-xs text-red-700">
+              Marca esto cuando el restaurante deje de pagar: su carta pública
+              deja de verse y el dueño no podrá guardar ningún cambio desde su
+              panel (platos, categorías, configuración), haga lo que haga.
+              Desmárcalo para devolverle el acceso.
+            </p>
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
