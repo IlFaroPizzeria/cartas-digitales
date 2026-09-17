@@ -324,20 +324,23 @@ export async function updateNegocioConfig(formData: FormData) {
   if (!nombre) throw new Error('El nombre es obligatorio')
   if (idiomas_activos.length === 0) throw new Error('Activa al menos un idioma')
 
-  // El español no cuenta para el límite: cada restaurante tiene un número
-  // de idiomas extra (además del español) que puede activar él mismo,
-  // controlado desde el panel de admin. Si quiere más, tiene que pedirlo
-  // y se le amplía desde ahí -- nunca lo puede subir él por su cuenta.
+  // El español siempre está permitido. Qué otros idiomas concretos puede
+  // activar el propio dueño lo decide el admin por restaurante
+  // (negocios.idiomas_permitidos) -- si quiere alguno que no tiene
+  // permitido, tiene que pedirlo y se le añade desde ahí, nunca lo puede
+  // activar él por su cuenta aunque llame a esta función a mano con otro
+  // valor.
   const idiomasExtra = idiomas_activos.filter((l) => l !== 'es')
   const { data: limite } = await supabase
     .from('negocios')
-    .select('idiomas_max_extra')
+    .select('idiomas_permitidos')
     .eq('id', negocioId)
     .single()
-  const maxExtra = limite?.idiomas_max_extra ?? 2
-  if (idiomasExtra.length > maxExtra) {
+  const permitidos = limite?.idiomas_permitidos ?? []
+  const noPermitidos = idiomasExtra.filter((l) => !permitidos.includes(l))
+  if (noPermitidos.length > 0) {
     throw new Error(
-      `Solo puedes tener ${maxExtra} idioma${maxExtra === 1 ? '' : 's'} extra activo${maxExtra === 1 ? '' : 's'} además del español. Contacta con nosotros si necesitas más.`
+      `Tu cuenta no tiene activado${noPermitidos.length === 1 ? '' : 's'} el idioma${noPermitidos.length === 1 ? '' : 's'} ${noPermitidos.join(', ')}. Contacta con nosotros si lo necesitas.`
     )
   }
 

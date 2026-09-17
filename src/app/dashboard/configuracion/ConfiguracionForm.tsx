@@ -16,7 +16,7 @@ type Negocio = {
   color_acento: string | null;
   logo_url: string | null;
   idiomas_activos: string[] | null;
-  idiomas_max_extra: number;
+  idiomas_permitidos: string[] | null;
 };
 
 const IDIOMAS: { id: string; label: string }[] = [
@@ -45,7 +45,7 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
     ),
   );
 
-  const idiomasMaxExtra = negocio.idiomas_max_extra ?? 2;
+  const idiomasPermitidos = new Set(negocio.idiomas_permitidos ?? []);
 
   function toggleIdioma(id: string) {
     setIdiomas((prev) => {
@@ -55,17 +55,14 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
         return next;
       }
 
-      // El español no cuenta para el límite: cada restaurante tiene un
-      // número de idiomas extra que puede activar él mismo (2 de base,
-      // ver /dashboard/cuenta o contacta con nosotros para ampliarlo).
-      if (id !== "es") {
-        const extrasActivos = Array.from(prev).filter((i) => i !== "es").length;
-        if (extrasActivos >= idiomasMaxExtra) {
-          toast.error(
-            `Solo puedes tener ${idiomasMaxExtra} idioma${idiomasMaxExtra === 1 ? "" : "s"} extra activo${idiomasMaxExtra === 1 ? "" : "s"} además del español. Contacta con nosotros si necesitas más.`,
-          );
-          return prev;
-        }
+      // Qué idiomas, además del español, puede activar este restaurante lo
+      // decide el admin por cuenta (ver /admin/restaurantes/[id]/editar).
+      // Si quiere alguno que no tiene permitido, tiene que pedirlo.
+      if (id !== "es" && !idiomasPermitidos.has(id)) {
+        toast.error(
+          "Este idioma no está incluido en tu cuenta. Contacta con nosotros si lo necesitas.",
+        );
+        return prev;
       }
 
       const next = new Set(prev);
@@ -230,18 +227,14 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
           Idiomas activos
         </label>
         <p className="text-xs text-slate-500 mb-2">
-          Español incluido siempre, más hasta {idiomasMaxExtra} idioma
-          {idiomasMaxExtra === 1 ? "" : "s"} extra. ¿Necesitas más? Contacta
-          con nosotros.
+          Español incluido siempre, más los idiomas que tengas contratados.
+          ¿Necesitas alguno más? Contacta con nosotros.
         </p>
         <div className="flex flex-wrap gap-2">
           {IDIOMAS.map((idioma) => {
             const activo = idiomas.has(idioma.id);
-            const extrasActivos = Array.from(idiomas).filter(
-              (i) => i !== "es",
-            ).length;
             const bloqueado =
-              !activo && idioma.id !== "es" && extrasActivos >= idiomasMaxExtra;
+              !activo && idioma.id !== "es" && !idiomasPermitidos.has(idioma.id);
             return (
               <button
                 key={idioma.id}
@@ -250,7 +243,7 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
                 disabled={bloqueado}
                 title={
                   bloqueado
-                    ? "Límite de idiomas extra alcanzado. Contacta con nosotros para ampliarlo."
+                    ? "Este idioma no está incluido en tu cuenta. Contacta con nosotros para añadirlo."
                     : undefined
                 }
                 className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${

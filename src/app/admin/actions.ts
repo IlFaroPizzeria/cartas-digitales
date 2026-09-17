@@ -78,21 +78,20 @@ export async function updateRestaurante(formData: FormData) {
   const fechaPago = String(formData.get("fecha_pago") ?? "").trim() || null;
   const ownerId = String(formData.get("owner_id") ?? "").trim() || null;
 
-  // Cuántos idiomas, además del español, puede activar este restaurante
-  // por su cuenta desde su panel (src/app/dashboard/configuracion). Por
-  // defecto todos empiezan con 2; si un cliente paga por más, se sube
-  // aquí a mano y se queda guardado hasta que se vuelva a tocar.
-  const idiomasMaxExtraRaw = formData.get("idiomas_max_extra");
-  const idiomasMaxExtra = Math.min(
-    5,
-    Math.max(0, Number(idiomasMaxExtraRaw ?? 2)),
-  );
+  // Qué idiomas concretos, además del español, puede activar este
+  // restaurante por su cuenta desde su panel
+  // (src/app/dashboard/configuracion) -- lo eliges tú aquí, restaurante
+  // por restaurante. El dueño solo puede marcar los que estén en esta
+  // lista; si quiere otro, tiene que pedirlo y se le añade desde aquí.
+  const IDIOMAS_VALIDOS = ["en", "de", "it", "sv", "fr"];
+  const idiomasPermitidos = formData
+    .getAll("idiomas_permitidos")
+    .map(String)
+    .filter((l) => IDIOMAS_VALIDOS.includes(l));
 
   if (!id) throw new Error("Restaurante no válido");
   if (!nombre) throw new Error("El nombre es obligatorio");
   if (!slug) throw new Error("El slug no es válido");
-  if (!Number.isFinite(idiomasMaxExtra))
-    throw new Error("El número de idiomas extra no es válido");
 
   const { error } = await supabase
     .from("negocios")
@@ -104,7 +103,7 @@ export async function updateRestaurante(formData: FormData) {
       plan,
       fecha_pago: fechaPago,
       owner_id: ownerId,
-      idiomas_max_extra: idiomasMaxExtra,
+      idiomas_permitidos: idiomasPermitidos,
     })
     .eq("id", id);
 

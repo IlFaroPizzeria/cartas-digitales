@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createRestaurante, updateRestaurante } from "../actions";
 import { useToast } from "@/components/ui/ToastProvider";
+import { IDIOMAS } from "@/lib/idiomas";
+
+const IDIOMAS_EXTRA = IDIOMAS.filter((i) => i.id !== "es");
 
 type Props = {
   restaurante?: {
@@ -15,7 +18,7 @@ type Props = {
     plan: string | null;
     fecha_pago: string | null;
     owner_id: string | null;
-    idiomas_max_extra: number;
+    idiomas_permitidos: string[];
   };
 };
 
@@ -24,6 +27,18 @@ export default function RestauranteForm({ restaurante }: Props) {
   const toast = useToast();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [idiomasPermitidos, setIdiomasPermitidos] = useState<Set<string>>(
+    new Set(restaurante?.idiomas_permitidos ?? []),
+  );
+
+  function toggleIdiomaPermitido(id: string) {
+    setIdiomasPermitidos((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   async function handleSubmit(formData: FormData) {
     setError(null);
@@ -150,23 +165,36 @@ export default function RestauranteForm({ restaurante }: Props) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Idiomas extra permitidos (además del español)
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Idiomas permitidos (además del español)
             </label>
-            <input
-              name="idiomas_max_extra"
-              type="number"
-              min={0}
-              max={5}
-              defaultValue={restaurante.idiomas_max_extra}
-              className={inputClass}
-            />
-            <p className="mt-1 text-xs text-slate-500">
-              Todos los restaurantes tienen 2 idiomas extra incluidos de
-              base. Si un cliente paga por más, súbelo aquí (hasta 5 en
-              total: inglés, alemán, italiano, sueco y francés) — se queda
-              guardado así hasta que lo vuelvas a cambiar.
+            <p className="text-xs text-slate-500 mb-2">
+              El dueño solo puede activar, desde su panel, los idiomas que
+              marques aquí. Si necesita otro más adelante, márcalo y se le
+              queda disponible.
             </p>
+            <div className="flex flex-wrap gap-2">
+              {IDIOMAS_EXTRA.map((idioma) => {
+                const activo = idiomasPermitidos.has(idioma.id);
+                return (
+                  <button
+                    key={idioma.id}
+                    type="button"
+                    onClick={() => toggleIdiomaPermitido(idioma.id)}
+                    className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
+                      activo
+                        ? "bg-indigo-50 text-indigo-700 border-indigo-300"
+                        : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
+                    }`}
+                  >
+                    {idioma.label}
+                  </button>
+                );
+              })}
+            </div>
+            {Array.from(idiomasPermitidos).map((id) => (
+              <input key={id} type="hidden" name="idiomas_permitidos" value={id} />
+            ))}
           </div>
         </>
       )}
