@@ -1,4 +1,5 @@
 import { cache } from 'react'
+import * as Sentry from '@sentry/nextjs'
 import { supabase } from '@/lib/supabase'
 
 // Solo las columnas que de verdad necesita la carta pública. El resto
@@ -26,6 +27,18 @@ export const getNegocioCarta = cache(async (slug: string) => {
   // Runtime Logs de Vercel y no hay que ir a ciegas.
   if (error) {
     console.error('[getNegocioCarta] error de Supabase para slug', slug, JSON.stringify(error))
+    // PGRST116 = "no rows" (single() sin resultados): es un 404 normal,
+    // pasa cada vez que alguien escribe mal la URL o el slug no existe,
+    // y no dice nada sobre la salud de la plataforma. Cualquier otro
+    // código (permiso denegado, columna inexistente...) sí es un fallo
+    // real -- como el que causó la caída global de todas las cartas en
+    // septiembre de 2026 -- y antes solo se veía si alguien miraba los
+    // Runtime Logs a mano. Ahora avisa solo.
+    if (error.code !== 'PGRST116') {
+      Sentry.captureException(new Error(`[getNegocioCarta] ${error.code}: ${error.message}`), {
+        extra: { slug, error },
+      })
+    }
   }
   return data
 })

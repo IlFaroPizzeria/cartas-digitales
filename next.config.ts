@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const securityHeaders = [
   // Evita que el navegador intente adivinar el tipo de un archivo servido
@@ -41,4 +42,17 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Sube sourcemaps a Sentry en el build de Vercel para que los stack
+// traces de producción se vean con el código real (no minificado).
+// Sin SENTRY_AUTH_TOKEN configurado (org/proyecto en sentry.io), esto
+// simplemente no sube nada -- no rompe el build ni bloquea el deploy.
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: true,
+  disableLogger: true,
+  widenClientFileUpload: true,
+  // El panel del restaurante y el público no necesitan que el SDK de
+  // Sentry pase por el tunneling de /monitoring -- lo dejamos simple.
+  tunnelRoute: false,
+});
