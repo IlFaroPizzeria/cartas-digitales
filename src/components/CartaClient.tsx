@@ -44,24 +44,36 @@ type Negocio = {
 
 type Lang = "es" | "en" | "de" | "it" | "sv" | "fr";
 
-const UI_TEXT: Record<Lang, { footLabel: string; noPlatos: string }> = {
+const UI_TEXT: Record<Lang, { footLabel: string; noPlatos: string; todos: string }> = {
   es: {
     footLabel: "Carta digital",
     noPlatos: "Todavía no hay platos disponibles.",
+    todos: "Todos",
   },
-  en: { footLabel: "Digital Menu", noPlatos: "No dishes available yet." },
+  en: {
+    footLabel: "Digital Menu",
+    noPlatos: "No dishes available yet.",
+    todos: "All",
+  },
   de: {
     footLabel: "Digitale Speisekarte",
     noPlatos: "Noch keine Gerichte verfügbar.",
+    todos: "Alle",
   },
   it: {
     footLabel: "Menù digitale",
     noPlatos: "Ancora nessun piatto disponibile.",
+    todos: "Tutti",
   },
-  sv: { footLabel: "Digital meny", noPlatos: "Inga rätter tillgängliga ännu." },
+  sv: {
+    footLabel: "Digital meny",
+    noPlatos: "Inga rätter tillgängliga ännu.",
+    todos: "Alla",
+  },
   fr: {
     footLabel: "Menu digital",
     noPlatos: "Aucun plat disponible pour le moment.",
+    todos: "Tous",
   },
 };
 
@@ -115,6 +127,11 @@ export default function CartaClient({
       : ["es"];
 
   const [lang, setLang] = useState<Lang>(idiomasActivos[0] || "es");
+  // Categoría seleccionada en la barra de arriba de la carta (null =
+  // "Todos"). Se guarda la categoría en español (estable) y no el
+  // texto ya traducido, para que la selección no se pierda al cambiar
+  // de idioma con el interruptor de arriba.
+  const [filtroCategoria, setFiltroCategoria] = useState<string | null>(null);
 
   // Registra la apertura de la carta (primera vez que se monta el
   // componente) y, después, cada cambio de idioma que haga el cliente
@@ -178,17 +195,31 @@ export default function CartaClient({
     return (p[key] as string | null) || p.nombre;
   }
 
-  // Agrupar por categoría (en el idioma activo), preservando el orden de aparición
-  const categorias: { nombre: string; platos: Plato[] }[] = [];
+  // Agrupar por categoría, preservando el orden de aparición. `base` es
+  // la categoría en español (estable, no cambia con el idioma -- sirve
+  // de clave para el filtro de la barra de categorías); `nombre` es el
+  // texto ya traducido al idioma activo, para mostrar.
+  const categorias: { base: string; nombre: string; platos: Plato[] }[] = [];
   platos.forEach((plato) => {
-    const cat = categoriaTexto(plato) || "Otros";
-    let grupo = categorias.find((c) => c.nombre === cat);
+    const base = plato.categoria || "Otros";
+    let grupo = categorias.find((c) => c.base === base);
     if (!grupo) {
-      grupo = { nombre: cat, platos: [] };
+      grupo = { base, nombre: categoriaTexto(plato) || "Otros", platos: [] };
       categorias.push(grupo);
     }
     grupo.platos.push(plato);
   });
+
+  // Si la categoría seleccionada ya no existe (por ejemplo, el dueño la
+  // vació de platos), se trata como "Todos" en vez de mostrar una carta
+  // vacía sin explicación.
+  const categoriaActiva =
+    filtroCategoria && categorias.some((c) => c.base === filtroCategoria)
+      ? filtroCategoria
+      : null;
+  const categoriasVisibles = categoriaActiva
+    ? categorias.filter((c) => c.base === categoriaActiva)
+    : categorias;
 
   const t = UI_TEXT[lang];
 
@@ -284,14 +315,58 @@ export default function CartaClient({
         </svg>
       </header>
 
+      {/* Barra de categorías: pulsar una muestra solo esos platos: pulsar
+          "Todos" (o volver a pulsar la misma) los vuelve a mostrar todos.
+          Pegada arriba al hacer scroll para no perderla de vista en
+          cartas largas. Solo tiene sentido si hay más de una categoría. */}
+      {categorias.length > 1 && (
+        <div
+          className="sticky top-0 z-20"
+          style={{
+            backgroundColor: colorFondo,
+            boxShadow: `0 1px 0 ${colorHeader}1F`,
+          }}
+        >
+          <nav className="mx-auto flex max-w-md gap-2 overflow-x-auto px-6 py-3">
+            <button
+              onClick={() => setFiltroCategoria(null)}
+              className="shrink-0 rounded-full px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide transition-colors"
+              style={
+                categoriaActiva === null
+                  ? { backgroundColor: colorAcento, color: colorHeader }
+                  : { backgroundColor: `${colorHeader}0D`, color: `${colorHeader}99` }
+              }
+            >
+              {t.todos}
+            </button>
+            {categorias.map((cat) => (
+              <button
+                key={cat.base}
+                onClick={() =>
+                  setFiltroCategoria(categoriaActiva === cat.base ? null : cat.base)
+                }
+                className="shrink-0 rounded-full px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide transition-colors"
+                style={
+                  categoriaActiva === cat.base
+                    ? { backgroundColor: colorAcento, color: colorHeader }
+                    : { backgroundColor: `${colorHeader}0D`, color: `${colorHeader}99` }
+                }
+              >
+                {cat.nombre}
+              </button>
+            ))}
+          </nav>
+        </div>
+      )}
+
       {/* Menú */}
       <main className="mx-auto max-w-md px-6 pt-6 pb-10">
         {categorias.length === 0 && (
           <p className="text-center text-sm text-[#6B7280]">{t.noPlatos}</p>
         )}
 
-        {categorias.map((cat, i) => (
-          <section key={cat.nombre} className={i > 0 ? "mt-10" : ""}>
+        {categoriasVisibles.map((cat, i) => (
+          <section key={cat.base} className={i > 0 ? "mt-10" : ""}>
             <h2
               className="text-xs tracking-[0.25em] uppercase mb-5 pb-2 border-b"
               style={{
