@@ -17,6 +17,24 @@ export const PLANTILLAS_INFO = [
     descripcion:
       'Cabecera clara y minimalista, tipografía de palo, platos en lista con divisores finos y precio alineado a la derecha.',
   },
+  {
+    id: 'elegante',
+    nombre: 'Elegante',
+    descripcion:
+      'Sin bloques de color, mucho espacio en blanco y tipografía serif fina en mayúsculas. Inspirada en las cartas de alta cocina.',
+  },
+  {
+    id: 'rustica',
+    nombre: 'Rústica',
+    descripcion:
+      'Cabecera y pie redondeados, logo a modo de sello y cada plato en su propia tarjeta con el precio en una insignia. Ambiente cálido y artesanal.',
+  },
+  {
+    id: 'compacta',
+    nombre: 'Compacta',
+    descripcion:
+      'Platos en cuadrícula de 2 columnas con lo justo de texto. Pensada para cartas muy largas, para que quepa todo sin apenas hacer scroll.',
+  },
 ] as const
 
 export type PlantillaId = (typeof PLANTILLAS_INFO)[number]['id']

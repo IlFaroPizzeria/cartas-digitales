@@ -285,6 +285,16 @@ export default function Clasica({
           {negocio.telefono && <p>{negocio.telefono}</p>}
           {negocio.email && <p>{negocio.email}</p>}
         </div>
+
+        <a
+          href="https://cartoca.es"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative mt-5 inline-block text-[10px] tracking-[0.2em] uppercase"
+          style={{ color: `${colorFondo}66` }}
+        >
+          Hecho con Cartoca
+        </a>
       </footer>
     </div>
   )

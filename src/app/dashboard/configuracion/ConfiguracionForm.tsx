@@ -31,6 +31,57 @@ const IDIOMAS: { id: string; label: string }[] = [
   { id: "fr", label: "Francés" },
 ];
 
+// Miniatura de cada plantilla en el selector de "Diseño de la carta":
+// una versión muy simplificada (solo formas y color) del aspecto real
+// de cada una, para que el dueño reconozca de un vistazo cuál es cuál
+// sin tener que abrir la carta pública.
+function Miniatura({ id }: { id: string }) {
+  if (id === "clasica") {
+    return (
+      <div className="h-16 rounded-lg bg-slate-800 flex flex-col items-center justify-center gap-1.5 mb-2">
+        <span className="h-3 w-3 rounded-full bg-white/80" />
+        <span className="h-1 w-10 rounded-full bg-white/30" />
+        <span className="h-1 w-14 rounded-full bg-white/20" />
+      </div>
+    );
+  }
+  if (id === "moderna") {
+    return (
+      <div className="h-16 rounded-lg border border-slate-200 bg-white flex flex-col items-center justify-center gap-1.5 mb-2">
+        <span className="h-3 w-3 rounded border border-slate-400" />
+        <span className="h-1 w-10 rounded-full bg-slate-700" />
+        <span className="h-1 w-14 rounded-full bg-slate-200" />
+      </div>
+    );
+  }
+  if (id === "elegante") {
+    return (
+      <div className="h-16 rounded-lg bg-white flex flex-col items-center justify-center gap-2 mb-2">
+        <span className="h-3 w-3 rounded-full border border-slate-400" />
+        <span className="h-1 w-6 rounded-full bg-slate-300" />
+        <span className="h-px w-10 bg-slate-300" />
+      </div>
+    );
+  }
+  if (id === "rustica") {
+    return (
+      <div className="h-16 rounded-[1.25rem] bg-amber-800 flex flex-col items-center justify-center gap-1.5 mb-2">
+        <span className="h-4 w-4 rounded-lg border-2 border-amber-100 bg-amber-300" />
+        <span className="h-2 w-9 rounded-full bg-amber-100/70" />
+      </div>
+    );
+  }
+  // compacta
+  return (
+    <div className="h-16 rounded-lg border border-slate-200 bg-white p-2.5 mb-2 grid grid-cols-2 gap-1.5 content-center">
+      <span className="h-1.5 w-full rounded-full bg-slate-700" />
+      <span className="h-1.5 w-full rounded-full bg-slate-700" />
+      <span className="h-1.5 w-3/4 rounded-full bg-slate-200" />
+      <span className="h-1.5 w-3/4 rounded-full bg-slate-200" />
+    </div>
+  );
+}
+
 export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
   const router = useRouter();
   const toast = useToast();
@@ -210,7 +261,7 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
           Cambia solo la maquetación -- tus colores, logo y datos de
           contacto se aplican igual en cualquiera.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {PLANTILLAS_INFO.map((p) => {
             const activa = plantilla === p.id;
             return (
@@ -224,19 +275,7 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
                     : "border-slate-200 hover:border-slate-300"
                 }`}
               >
-                {p.id === "clasica" ? (
-                  <div className="h-16 rounded-lg bg-slate-800 flex flex-col items-center justify-center gap-1.5 mb-2">
-                    <span className="h-3 w-3 rounded-full bg-white/80" />
-                    <span className="h-1 w-10 rounded-full bg-white/30" />
-                    <span className="h-1 w-14 rounded-full bg-white/20" />
-                  </div>
-                ) : (
-                  <div className="h-16 rounded-lg border border-slate-200 bg-white flex flex-col items-center justify-center gap-1.5 mb-2">
-                    <span className="h-3 w-3 rounded border border-slate-400" />
-                    <span className="h-1 w-10 rounded-full bg-slate-700" />
-                    <span className="h-1 w-14 rounded-full bg-slate-200" />
-                  </div>
-                )}
+                <Miniatura id={p.id} />
                 <p className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
                   {p.nombre}
                   {activa && (

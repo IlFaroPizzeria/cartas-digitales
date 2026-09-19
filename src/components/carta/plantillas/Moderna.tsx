@@ -213,6 +213,15 @@ export default function Moderna({
           {negocio.telefono && <p>{negocio.telefono}</p>}
           {negocio.email && <p>{negocio.email}</p>}
         </div>
+        <a
+          href="https://cartoca.es"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-block text-[10px] uppercase tracking-wide"
+          style={{ color: `${colorHeader}59` }}
+        >
+          Hecho con Cartoca
+        </a>
       </footer>
     </div>
   )
