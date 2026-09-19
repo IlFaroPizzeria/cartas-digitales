@@ -4,10 +4,11 @@ import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import AuthTabs from '@/components/auth/AuthTabs'
-import TurnstileWidget from '@/components/auth/TurnstileWidget'
 import { verificarCaptchaLogin } from './actions'
 
-const CAPTCHA_ACTIVO = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY)
+// Bypass temporal del captcha (ver src/lib/turnstile.ts) -- widget
+// de Cloudflare Turnstile roto en producción para todo el mundo.
+const CAPTCHA_ACTIVO = false
 
 export default function LoginPage() {
   const router = useRouter()
@@ -16,7 +17,6 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-  const [captchaVersion, setCaptchaVersion] = useState(0)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -27,7 +27,6 @@ export default function LoginPage() {
     if (!captchaOk) {
       setLoading(false)
       setCaptchaToken(null)
-      setCaptchaVersion((v) => v + 1)
       setError('No hemos podido verificar que no eres un robot. Inténtalo de nuevo.')
       return
     }
@@ -40,7 +39,6 @@ export default function LoginPage() {
     if (error) {
       setError('Email o contraseña incorrectos.')
       setCaptchaToken(null)
-      setCaptchaVersion((v) => v + 1)
       return
     }
 
@@ -88,10 +86,6 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full mb-4 rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
-
-            <div className="mb-4">
-              <TurnstileWidget key={captchaVersion} onVerify={setCaptchaToken} />
-            </div>
 
             {error && (
               <p className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
