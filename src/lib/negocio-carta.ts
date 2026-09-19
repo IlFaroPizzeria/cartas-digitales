@@ -19,10 +19,11 @@ export const getNegocioCarta = cache(async (slug: string) => {
     .select('id, nombre, slug, activo, suspendido, tagline, telefono, email, direccion, color_fondo, color_header, color_acento, logo_url, idiomas_activos, plantilla, mostrar_barra_categorias')
     .eq('slug', slug)
     .single()
-  // Log temporal de diagnóstico (404 global del 19/09/2026): sin esto no
-  // hay forma de ver por qué getNegocioCarta no encuentra un negocio que sí
-  // existe -- el error de Supabase se estaba ignorando en silencio. Quitar
-  // en cuanto quede claro el origen del problema.
+  // Si Supabase devuelve un error (por ejemplo, falta una columna o un
+  // permiso tras una migración a medias), se deja constancia en los logs
+  // en vez de fallar en silencio como antes -- así la próxima vez que una
+  // carta pública dé 404 sin motivo aparente, el porqué está en los
+  // Runtime Logs de Vercel y no hay que ir a ciegas.
   if (error) {
     console.error('[getNegocioCarta] error de Supabase para slug', slug, JSON.stringify(error))
   }
