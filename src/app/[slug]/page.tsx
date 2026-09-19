@@ -157,6 +157,7 @@ export default async function CartaDigital({
           color_acento: negocio.color_acento || '#b8863b',
           logo_url: negocio.logo_url,
           idiomas_activos: negocio.idiomas_activos,
+          plantilla: negocio.plantilla,
         }}
         platos={platos as never}
       />
