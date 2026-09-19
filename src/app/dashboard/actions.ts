@@ -323,6 +323,12 @@ export async function updateNegocioConfig(formData: FormData) {
   const idiomas_activos = formData.getAll('idiomas_activos').map(String)
   const plantillaRaw = String(formData.get('plantilla') ?? '').trim()
   const plantilla = esPlantillaValida(plantillaRaw) ? plantillaRaw : PLANTILLA_POR_DEFECTO
+  // Navegación de la carta: barra de categorías (por defecto) o carta
+  // apilada como antes de que existiera el filtro. Viaja como 'true'/
+  // 'false' en un input oculto (ver ConfiguracionForm.tsx), igual que
+  // 'plantilla', para no depender de la semántica rara de los checkbox
+  // en FormData (un checkbox sin marcar ni siquiera aparece).
+  const mostrar_barra_categorias = formData.get('mostrar_barra_categorias') !== 'false'
 
   if (!nombre) throw new Error('El nombre es obligatorio')
   if (idiomas_activos.length === 0) throw new Error('Activa al menos un idioma')
@@ -358,6 +364,7 @@ export async function updateNegocioConfig(formData: FormData) {
     color_acento,
     idiomas_activos,
     plantilla,
+    mostrar_barra_categorias,
   }
 
   const logo = formData.get('logo')

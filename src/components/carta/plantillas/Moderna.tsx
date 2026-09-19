@@ -41,6 +41,7 @@ export default function Moderna({
   setLang,
   idiomasActivos,
   t,
+  mostrarBarraCategorias,
   categorias,
   categoriaActiva,
   categoriasVisibles,
@@ -103,7 +104,7 @@ export default function Moderna({
       {/* Barra de categorías: pestañas subrayadas en vez de píldoras.
           Misma lógica de filtro que la plantilla Clásica (categoriaActiva
           / seleccionarCategoria vienen ya resueltas de useCartaData). */}
-      {categorias.length > 1 && (
+      {mostrarBarraCategorias && categorias.length > 1 && (
         <div
           className="sticky top-0 z-20 border-b"
           style={{ backgroundColor: colorFondo, borderColor: `${colorHeader}1A` }}

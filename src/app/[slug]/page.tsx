@@ -158,6 +158,7 @@ export default async function CartaDigital({
           logo_url: negocio.logo_url,
           idiomas_activos: negocio.idiomas_activos,
           plantilla: negocio.plantilla,
+          mostrar_barra_categorias: negocio.mostrar_barra_categorias,
         }}
         platos={platos as never}
       />

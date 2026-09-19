@@ -159,11 +159,19 @@ export function useCartaData(
     grupo.platos.push(platoResuelto)
   })
 
+  // Si el negocio ha elegido carta apilada en vez de barra de
+  // categorías (configuración > "Navegación de la carta"), no hay
+  // filtro que aplicar: se muestran siempre todas las categorías
+  // seguidas, como antes de que existiera este filtro.
+  const mostrarBarraCategorias = negocio.mostrar_barra_categorias !== false
+
   // Si la categoría seleccionada ya no existe (por ejemplo, el dueño la
   // vació de platos), se trata como "Todos" en vez de dejar la carta
   // vacía sin explicación.
   const categoriaActiva =
-    filtroCategoria && categorias.some((c) => c.base === filtroCategoria)
+    mostrarBarraCategorias &&
+    filtroCategoria &&
+    categorias.some((c) => c.base === filtroCategoria)
       ? filtroCategoria
       : null
   const categoriasVisibles = categoriaActiva
@@ -187,6 +195,7 @@ export function useCartaData(
     setLang,
     idiomasActivos,
     t: UI_TEXT[lang],
+    mostrarBarraCategorias,
     categorias,
     categoriaActiva,
     categoriasVisibles,

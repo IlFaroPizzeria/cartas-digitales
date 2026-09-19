@@ -16,7 +16,7 @@ import { supabase } from '@/lib/supabase'
 export const getNegocioCarta = cache(async (slug: string) => {
   const { data } = await supabase
     .from('negocios')
-    .select('id, nombre, slug, activo, suspendido, tagline, telefono, email, direccion, color_fondo, color_header, color_acento, logo_url, idiomas_activos, plantilla')
+    .select('id, nombre, slug, activo, suspendido, tagline, telefono, email, direccion, color_fondo, color_header, color_acento, logo_url, idiomas_activos, plantilla, mostrar_barra_categorias')
     .eq('slug', slug)
     .single()
   return data

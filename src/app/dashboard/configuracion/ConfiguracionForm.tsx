@@ -19,6 +19,7 @@ type Negocio = {
   idiomas_activos: string[] | null;
   idiomas_permitidos: string[] | null;
   plantilla: string | null;
+  mostrar_barra_categorias: boolean | null;
 };
 
 const IDIOMAS: { id: string; label: string }[] = [
@@ -50,6 +51,9 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
   const idiomasPermitidos = new Set(negocio.idiomas_permitidos ?? []);
   const [plantilla, setPlantilla] = useState<string>(
     negocio.plantilla || PLANTILLA_POR_DEFECTO,
+  );
+  const [mostrarBarraCategorias, setMostrarBarraCategorias] = useState<boolean>(
+    negocio.mostrar_barra_categorias !== false,
   );
 
   function toggleIdioma(id: string) {
@@ -109,6 +113,11 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
         <input key={id} type="hidden" name="idiomas_activos" value={id} />
       ))}
       <input type="hidden" name="plantilla" value={plantilla} />
+      <input
+        type="hidden"
+        name="mostrar_barra_categorias"
+        value={String(mostrarBarraCategorias)}
+      />
 
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -242,6 +251,76 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
               </button>
             );
           })}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Navegación de la carta
+        </label>
+        <p className="text-xs text-slate-500 mb-2">
+          Con categorías arriba, el cliente pulsa &ldquo;Entrantes&rdquo;,
+          &ldquo;Principales&rdquo;... y ve solo esos platos. Con la carta
+          apilada se ve todo seguido, sin filtro, como antes.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => setMostrarBarraCategorias(true)}
+            className={`text-left rounded-xl border-2 p-3 transition-colors ${
+              mostrarBarraCategorias
+                ? "border-indigo-500 bg-indigo-50/50"
+                : "border-slate-200 hover:border-slate-300"
+            }`}
+          >
+            <div className="h-16 rounded-lg border border-slate-200 bg-white flex flex-col items-center justify-center gap-1.5 mb-2">
+              <span className="flex gap-1">
+                <span className="h-2.5 w-8 rounded-full bg-slate-700" />
+                <span className="h-2.5 w-8 rounded-full bg-slate-200" />
+                <span className="h-2.5 w-8 rounded-full bg-slate-200" />
+              </span>
+              <span className="h-1 w-14 rounded-full bg-slate-200" />
+            </div>
+            <p className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
+              Categorías arriba
+              {mostrarBarraCategorias && (
+                <span className="text-[10px] font-semibold text-indigo-600 uppercase tracking-wide">
+                  Activa
+                </span>
+              )}
+            </p>
+            <p className="mt-0.5 text-xs text-slate-500 leading-snug">
+              Pestañas para filtrar por categoría. Recomendado en cartas
+              largas.
+            </p>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMostrarBarraCategorias(false)}
+            className={`text-left rounded-xl border-2 p-3 transition-colors ${
+              !mostrarBarraCategorias
+                ? "border-indigo-500 bg-indigo-50/50"
+                : "border-slate-200 hover:border-slate-300"
+            }`}
+          >
+            <div className="h-16 rounded-lg border border-slate-200 bg-white flex flex-col items-center justify-center gap-1 mb-2">
+              <span className="h-1 w-12 rounded-full bg-slate-700" />
+              <span className="h-1 w-14 rounded-full bg-slate-200" />
+              <span className="h-1 w-10 rounded-full bg-slate-700" />
+              <span className="h-1 w-14 rounded-full bg-slate-200" />
+            </div>
+            <p className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
+              Carta apilada
+              {!mostrarBarraCategorias && (
+                <span className="text-[10px] font-semibold text-indigo-600 uppercase tracking-wide">
+                  Activa
+                </span>
+              )}
+            </p>
+            <p className="mt-0.5 text-xs text-slate-500 leading-snug">
+              Todas las categorías seguidas, sin filtro. Como estaba antes.
+            </p>
+          </button>
         </div>
       </div>
 

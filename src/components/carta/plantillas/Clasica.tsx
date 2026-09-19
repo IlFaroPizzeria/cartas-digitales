@@ -44,6 +44,7 @@ export default function Clasica({
   setLang,
   idiomasActivos,
   t,
+  mostrarBarraCategorias,
   categorias,
   categoriaActiva,
   categoriasVisibles,
@@ -145,7 +146,7 @@ export default function Clasica({
           "Todos" (o volver a pulsar la misma) los vuelve a mostrar todos.
           Pegada arriba al hacer scroll para no perderla de vista en
           cartas largas. Solo tiene sentido si hay más de una categoría. */}
-      {categorias.length > 1 && (
+      {mostrarBarraCategorias && categorias.length > 1 && (
         <div
           className="sticky top-0 z-20"
           style={{

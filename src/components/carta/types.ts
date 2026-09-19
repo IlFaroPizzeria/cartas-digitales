@@ -44,6 +44,7 @@ export type NegocioCarta = {
   logo_url: string | null
   idiomas_activos: string[] | null
   plantilla: string | null
+  mostrar_barra_categorias: boolean | null
 }
 
 // Un plato ya resuelto al idioma activo: nombre/descripción/etiquetas
@@ -88,6 +89,11 @@ export type CartaData = {
   setLang: (lang: Lang) => void
   idiomasActivos: Lang[]
   t: TextosUI
+  // Si el negocio ha elegido carta apilada (mostrar_barra_categorias =
+  // false), las plantillas no deben pintar la barra de navegación de
+  // categorías -- categoriasVisibles ya viene siempre igual a
+  // categorias en ese caso (ver useCartaData).
+  mostrarBarraCategorias: boolean
   categorias: CategoriaResuelta[]
   categoriaActiva: string | null
   categoriasVisibles: CategoriaResuelta[]
