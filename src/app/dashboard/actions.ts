@@ -6,6 +6,7 @@ import { createClient as createSupabaseJsClient } from '@supabase/supabase-js'
 import { etiquetasValidas } from '@/lib/etiquetas'
 import { IDIOMAS_TRADUCIBLES, traduccionDisponible, traducirAIdiomas } from '@/lib/translate'
 import { buscarCategoriaPredefinida, traduccionesPorNombreEs } from '@/lib/categoriasPredefinidas'
+import { esPlantillaValida, PLANTILLA_POR_DEFECTO } from '@/components/carta/plantillas/catalogo'
 
 // Alias para no romper el resto del archivo, que ya usa `createClient()`
 // como nombre para el cliente de servidor.
@@ -320,6 +321,8 @@ export async function updateNegocioConfig(formData: FormData) {
   const color_header = String(formData.get('color_header') ?? '').trim() || null
   const color_acento = String(formData.get('color_acento') ?? '').trim() || null
   const idiomas_activos = formData.getAll('idiomas_activos').map(String)
+  const plantillaRaw = String(formData.get('plantilla') ?? '').trim()
+  const plantilla = esPlantillaValida(plantillaRaw) ? plantillaRaw : PLANTILLA_POR_DEFECTO
 
   if (!nombre) throw new Error('El nombre es obligatorio')
   if (idiomas_activos.length === 0) throw new Error('Activa al menos un idioma')
@@ -354,6 +357,7 @@ export async function updateNegocioConfig(formData: FormData) {
     color_header,
     color_acento,
     idiomas_activos,
+    plantilla,
   }
 
   const logo = formData.get('logo')

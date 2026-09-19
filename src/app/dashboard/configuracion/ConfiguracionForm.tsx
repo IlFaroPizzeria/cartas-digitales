@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateNegocioConfig } from "@/app/dashboard/actions";
 import { useToast } from "@/components/ui/ToastProvider";
+import { PLANTILLAS_INFO, PLANTILLA_POR_DEFECTO } from "@/components/carta/plantillas/catalogo";
 
 type Negocio = {
   nombre: string;
@@ -17,6 +18,7 @@ type Negocio = {
   logo_url: string | null;
   idiomas_activos: string[] | null;
   idiomas_permitidos: string[] | null;
+  plantilla: string | null;
 };
 
 const IDIOMAS: { id: string; label: string }[] = [
@@ -46,6 +48,9 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
   );
 
   const idiomasPermitidos = new Set(negocio.idiomas_permitidos ?? []);
+  const [plantilla, setPlantilla] = useState<string>(
+    negocio.plantilla || PLANTILLA_POR_DEFECTO,
+  );
 
   function toggleIdioma(id: string) {
     setIdiomas((prev) => {
@@ -103,6 +108,7 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
       {Array.from(idiomas).map((id) => (
         <input key={id} type="hidden" name="idiomas_activos" value={id} />
       ))}
+      <input type="hidden" name="plantilla" value={plantilla} />
 
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -184,6 +190,58 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
             onChange={handleLogoChange}
             className="text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium hover:file:bg-slate-200"
           />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Diseño de la carta
+        </label>
+        <p className="text-xs text-slate-500 mb-2">
+          Cambia solo la maquetación -- tus colores, logo y datos de
+          contacto se aplican igual en cualquiera.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {PLANTILLAS_INFO.map((p) => {
+            const activa = plantilla === p.id;
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => setPlantilla(p.id)}
+                className={`text-left rounded-xl border-2 p-3 transition-colors ${
+                  activa
+                    ? "border-indigo-500 bg-indigo-50/50"
+                    : "border-slate-200 hover:border-slate-300"
+                }`}
+              >
+                {p.id === "clasica" ? (
+                  <div className="h-16 rounded-lg bg-slate-800 flex flex-col items-center justify-center gap-1.5 mb-2">
+                    <span className="h-3 w-3 rounded-full bg-white/80" />
+                    <span className="h-1 w-10 rounded-full bg-white/30" />
+                    <span className="h-1 w-14 rounded-full bg-white/20" />
+                  </div>
+                ) : (
+                  <div className="h-16 rounded-lg border border-slate-200 bg-white flex flex-col items-center justify-center gap-1.5 mb-2">
+                    <span className="h-3 w-3 rounded border border-slate-400" />
+                    <span className="h-1 w-10 rounded-full bg-slate-700" />
+                    <span className="h-1 w-14 rounded-full bg-slate-200" />
+                  </div>
+                )}
+                <p className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
+                  {p.nombre}
+                  {activa && (
+                    <span className="text-[10px] font-semibold text-indigo-600 uppercase tracking-wide">
+                      Activa
+                    </span>
+                  )}
+                </p>
+                <p className="mt-0.5 text-xs text-slate-500 leading-snug">
+                  {p.descripcion}
+                </p>
+              </button>
+            );
+          })}
         </div>
       </div>
 

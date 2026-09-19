@@ -12,7 +12,7 @@ export default async function ConfiguracionPage() {
   const { data: negocio } = await supabase
     .from('negocios')
     .select(
-      'nombre, tagline, telefono, email, direccion, color_fondo, color_header, color_acento, logo_url, idiomas_activos, idiomas_permitidos'
+      'nombre, tagline, telefono, email, direccion, color_fondo, color_header, color_acento, logo_url, idiomas_activos, idiomas_permitidos, plantilla'
     )
     .eq('owner_id', user.id)
     .maybeSingle()
