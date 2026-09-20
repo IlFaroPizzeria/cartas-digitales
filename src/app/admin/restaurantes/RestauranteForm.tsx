@@ -60,7 +60,7 @@ export default function RestauranteForm({ restaurante }: Props) {
   }
 
   const inputClass =
-    "w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500";
+    "w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand";
 
   return (
     <form action={handleSubmit} className="space-y-4">
@@ -101,12 +101,12 @@ export default function RestauranteForm({ restaurante }: Props) {
               type="checkbox"
               name="activo"
               defaultChecked={restaurante.activo}
-              className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+              className="h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand"
             />
             Restaurante activo (visible en su carta pública)
           </label>
 
-          <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+          <div className="rounded-xl border border-red-200 bg-red-50/80 p-3">
             <label className="flex items-center gap-2 text-sm font-medium text-red-800">
               <input
                 type="checkbox"
@@ -183,8 +183,8 @@ export default function RestauranteForm({ restaurante }: Props) {
                     onClick={() => toggleIdiomaPermitido(idioma.id)}
                     className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
                       activo
-                        ? "bg-indigo-50 text-indigo-700 border-indigo-300"
-                        : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
+                        ? "bg-brand/10 text-brand-dark border-brand/40"
+                        : "bg-white/70 text-slate-600 border-slate-300 hover:bg-white"
                     }`}
                   >
                     {idioma.label}
@@ -209,14 +209,14 @@ export default function RestauranteForm({ restaurante }: Props) {
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white py-3 text-base font-medium shadow-sm transition-colors disabled:opacity-50"
+          className="flex-1 rounded-lg bg-brand hover:bg-brand-dark text-white py-3 text-base font-medium shadow-sm transition-colors disabled:opacity-50"
         >
           {loading ? "Guardando..." : "Guardar"}
         </button>
         <button
           type="button"
           onClick={() => router.push("/admin")}
-          className="rounded-lg border border-slate-300 px-4 py-3 text-base font-medium text-slate-700 hover:bg-slate-50"
+          className="rounded-lg border border-slate-300 px-4 py-3 text-base font-medium text-slate-700 hover:bg-white/80 transition-colors"
         >
           Cancelar
         </button>

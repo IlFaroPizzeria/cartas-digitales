@@ -20,12 +20,12 @@ export default async function EditarRestaurantePage({
   if (!restaurante) notFound()
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+    <div className="max-w-md mx-auto glass-card rounded-2xl p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-lg font-semibold text-slate-900">Editar restaurante</h1>
         <Link
           href={`/admin/restaurantes/${restaurante.id}/carta`}
-          className="text-xs font-semibold px-2.5 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:bg-slate-50"
+          className="text-xs font-semibold px-2.5 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:bg-white/80 transition-colors"
         >
           Ver carta
         </Link>

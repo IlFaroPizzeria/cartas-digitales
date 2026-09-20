@@ -19,7 +19,7 @@ export default async function AuditoriaPage() {
         </p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 divide-y divide-slate-100">
+      <div className="glass-card rounded-2xl divide-y divide-black/[0.06] overflow-hidden">
         {(entradas ?? []).map((e) => (
           <div key={e.id} className="p-4 flex items-start justify-between gap-3 flex-wrap">
             <div className="min-w-0">

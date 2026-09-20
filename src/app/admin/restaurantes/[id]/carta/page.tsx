@@ -90,19 +90,19 @@ export default async function AdminCartaPage({
           </div>
           <Link
             href={`/admin/restaurantes/${negocioId}/carta/platos/nuevo`}
-            className="rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 shadow-sm transition-colors shrink-0"
+            className="rounded-lg bg-brand hover:bg-brand-dark text-white text-sm font-medium px-4 py-2.5 shadow-sm transition-colors shrink-0"
           >
             + Añadir plato
           </Link>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+      <div className="glass-card rounded-2xl p-5">
         <h2 className="text-sm font-semibold text-slate-900 mb-3">Categorías</h2>
         {(!categorias || categorias.length === 0) && (
           <p className="text-sm text-slate-500 mb-2">Todavía no tiene categorías.</p>
         )}
-        <ul className="divide-y divide-slate-100">
+        <ul className="divide-y divide-black/[0.06]">
           {(categorias ?? []).map((categoria, i) => (
             <CategoriaRow
               key={categoria.id}
@@ -114,7 +114,7 @@ export default async function AdminCartaPage({
             />
           ))}
         </ul>
-        <div className="mt-4 pt-4 border-t border-slate-100">
+        <div className="mt-4 pt-4 border-t border-black/[0.06]">
           <NuevaCategoriaForm
             categoriasExistentes={(categorias ?? []).map((c) => c.nombre)}
             createAction={adminCreateCategoriaBound}
@@ -123,22 +123,22 @@ export default async function AdminCartaPage({
       </div>
 
       {grupos.length === 0 && (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-10 text-center">
+        <div className="glass-card rounded-2xl p-10 text-center">
           <p className="text-sm text-slate-500">Todavía no tiene platos.</p>
         </div>
       )}
 
       {grupos.map((grupo) => (
-        <div key={grupo.nombre} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <div key={grupo.nombre} className="glass-card rounded-2xl p-5">
           <div className="flex items-center justify-between mb-1">
-            <h2 className="text-xs font-bold uppercase tracking-wide text-indigo-700">
+            <h2 className="text-xs font-bold uppercase tracking-wide text-brand-dark">
               {grupo.nombre}
             </h2>
             <span className="text-xs text-slate-400">
               {grupo.platos.length} {grupo.platos.length === 1 ? 'plato' : 'platos'}
             </span>
           </div>
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-black/[0.06]">
             {grupo.platos.map((plato, i) => (
               <PlatoRow
                 key={plato.id}

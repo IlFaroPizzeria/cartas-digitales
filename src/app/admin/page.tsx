@@ -22,17 +22,17 @@ export default async function AdminPage() {
         </div>
         <Link
           href="/admin/restaurantes/nuevo"
-          className="rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 shadow-sm transition-colors shrink-0"
+          className="rounded-lg bg-brand hover:bg-brand-dark text-white text-sm font-medium px-4 py-2.5 shadow-sm transition-colors shrink-0"
         >
           + Crear restaurante
         </Link>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 divide-y divide-slate-100">
+      <div className="glass-card rounded-2xl divide-y divide-black/[0.06] overflow-hidden">
         {(negocios ?? []).map((n) => (
           <div
             key={n.id}
-            className="flex items-center justify-between gap-3 p-4 flex-wrap"
+            className="flex items-center justify-between gap-3 p-4 flex-wrap transition-colors hover:bg-white/50"
           >
             <div className="min-w-0">
               <p className="text-[15px] font-medium text-slate-900">
@@ -60,7 +60,7 @@ export default async function AdminPage() {
               <span
                 className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
                   n.owner_id
-                    ? "bg-indigo-50 text-indigo-700 border-indigo-200"
+                    ? "bg-brand/10 text-brand-dark border-brand/30"
                     : "bg-amber-50 text-amber-700 border-amber-200"
                 }`}
               >
@@ -79,13 +79,13 @@ export default async function AdminPage() {
               )}
               <Link
                 href={`/admin/restaurantes/${n.id}/editar`}
-                className="text-xs font-semibold px-2.5 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:bg-slate-50"
+                className="text-xs font-semibold px-2.5 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:bg-white/80 transition-colors"
               >
                 Editar
               </Link>
               <Link
                 href={`/admin/restaurantes/${n.id}/carta`}
-                className="text-xs font-semibold px-2.5 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:bg-slate-50"
+                className="text-xs font-semibold px-2.5 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:bg-white/80 transition-colors"
               >
                 Carta
               </Link>
