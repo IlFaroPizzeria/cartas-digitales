@@ -25,7 +25,7 @@ export default function LogoutButton({
         onClick={handleLogout}
         aria-label="Cerrar sesión"
         title="Cerrar sesión"
-        className="flex items-center justify-center h-9 w-9 rounded-lg text-slate-400 hover:bg-white/10 hover:text-red-400 transition-colors"
+        className="flex items-center justify-center h-9 w-9 rounded-lg text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors"
       >
         <svg
           viewBox="0 0 24 24"
@@ -48,7 +48,7 @@ export default function LogoutButton({
     return (
       <button
         onClick={handleLogout}
-        className="text-sm font-medium text-slate-400 hover:text-red-400 transition-colors"
+        className="text-sm font-medium text-slate-500 hover:text-red-600 transition-colors"
       >
         Cerrar sesión
       </button>
@@ -58,7 +58,7 @@ export default function LogoutButton({
   return (
     <button
       onClick={handleLogout}
-      className="w-full rounded-lg border border-slate-800 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+      className="w-full rounded-lg border border-black/[0.08] py-2.5 text-sm font-medium text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
     >
       Cerrar sesión
     </button>

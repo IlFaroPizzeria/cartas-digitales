@@ -103,11 +103,11 @@ export default function PlatoRow({
           )}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
-          <div className="flex rounded-md border border-slate-200 overflow-hidden">
+          <div className="flex rounded-md border border-black/[0.08] overflow-hidden">
             <button
               onClick={() => handleMove("arriba")}
               disabled={esPrimera || pending}
-              className="px-1.5 py-1 text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent border-r border-slate-200"
+              className="px-1.5 py-1 text-slate-500 hover:bg-black/[0.04] disabled:opacity-30 disabled:hover:bg-transparent border-r border-black/[0.08]"
               aria-label="Subir"
             >
               ↑
@@ -115,7 +115,7 @@ export default function PlatoRow({
             <button
               onClick={() => handleMove("abajo")}
               disabled={esUltima || pending}
-              className="px-1.5 py-1 text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent"
+              className="px-1.5 py-1 text-slate-500 hover:bg-black/[0.04] disabled:opacity-30 disabled:hover:bg-transparent"
               aria-label="Bajar"
             >
               ↓
@@ -124,20 +124,19 @@ export default function PlatoRow({
           <button
             onClick={handleToggle}
             disabled={pending}
-            className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-full border whitespace-nowrap ${
-              disponible
-                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                : "bg-slate-100 text-slate-600 border-slate-300"
-            }`}
+            aria-pressed={disponible}
+            className="inline-flex items-center gap-2 whitespace-nowrap disabled:opacity-50"
           >
+            <span className={`ios-toggle ${disponible ? "" : "off"}`} />
             <span
-              className={`h-1.5 w-1.5 rounded-full ${disponible ? "bg-emerald-500" : "bg-slate-400"}`}
-            />
-            {disponible ? "Disponible" : "No disponible"}
+              className={`text-xs font-medium ${disponible ? "text-slate-700" : "text-slate-400"}`}
+            >
+              {disponible ? "Disponible" : "No disponible"}
+            </span>
           </button>
           <Link
             href={editHref ?? `/dashboard/platos/${plato.id}/editar`}
-            className="text-xs font-semibold px-2.5 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:bg-slate-50"
+            className="text-xs font-semibold px-2.5 py-1.5 rounded-full border border-black/[0.12] text-slate-700 hover:bg-black/[0.04]"
           >
             Editar
           </Link>

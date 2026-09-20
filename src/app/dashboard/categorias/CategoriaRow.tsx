@@ -54,11 +54,11 @@ export default function CategoriaRow({
         </span>
 
         <div className="flex items-center gap-1.5 shrink-0">
-          <div className="flex rounded-md border border-slate-200 overflow-hidden">
+          <div className="flex rounded-md border border-black/[0.08] overflow-hidden">
             <button
               onClick={() => mover("arriba")}
               disabled={esPrimera || pending}
-              className="px-1.5 py-1 text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent border-r border-slate-200"
+              className="px-1.5 py-1 text-slate-500 hover:bg-black/[0.04] disabled:opacity-30 disabled:hover:bg-transparent border-r border-black/[0.08]"
               aria-label="Subir"
             >
               ↑
@@ -66,7 +66,7 @@ export default function CategoriaRow({
             <button
               onClick={() => mover("abajo")}
               disabled={esUltima || pending}
-              className="px-1.5 py-1 text-slate-500 hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent"
+              className="px-1.5 py-1 text-slate-500 hover:bg-black/[0.04] disabled:opacity-30 disabled:hover:bg-transparent"
               aria-label="Bajar"
             >
               ↓

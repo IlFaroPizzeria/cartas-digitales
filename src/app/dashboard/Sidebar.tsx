@@ -61,9 +61,9 @@ const LINKS = [
 // ya carga (negocio.activo / negocio.suspendido): no dispara ninguna
 // consulta nueva, solo los hace más visibles.
 function estadoNegocio(activo: boolean | null, suspendido: boolean) {
-  if (suspendido) return { color: 'bg-red-500', text: 'text-red-400', label: 'Suspendida' }
-  if (activo === false) return { color: 'bg-amber-500', text: 'text-amber-400', label: 'Pendiente' }
-  if (activo === true) return { color: 'bg-emerald-500', text: 'text-emerald-400', label: 'Activa' }
+  if (suspendido) return { color: 'bg-red-500', text: 'text-red-500', label: 'Suspendida' }
+  if (activo === false) return { color: 'bg-amber-500', text: 'text-amber-600', label: 'Pendiente' }
+  if (activo === true) return { color: 'bg-emerald-500', text: 'text-emerald-600', label: 'Activa' }
   return null
 }
 
@@ -82,12 +82,15 @@ function AvatarConEstado({
   const dimensiones = size === 9 ? 'h-9 w-9' : 'h-8 w-8'
   return (
     <span className={`relative shrink-0 ${dimensiones}`}>
-      <span className={`flex items-center justify-center ${dimensiones} rounded-lg bg-indigo-500 text-white text-sm font-semibold`}>
+      <span
+        className={`flex items-center justify-center ${dimensiones} rounded-xl text-white text-sm font-semibold`}
+        style={{ background: 'linear-gradient(150deg, #4fa8ff, var(--brand))', boxShadow: '0 6px 16px rgba(10,132,255,0.35)' }}
+      >
         {inicial}
       </span>
       {estado && (
         <span
-          className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-slate-900 ${estado.color}`}
+          className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${estado.color}`}
           aria-hidden="true"
         />
       )}
@@ -108,11 +111,11 @@ function BrandBlock({
 }) {
   const estado = estadoNegocio(activo, suspendido)
   return (
-    <div className="px-5 pt-5 pb-4 border-b border-slate-800">
+    <div className="glass-card rounded-2xl px-5 pt-5 pb-4">
       <div className="flex items-center gap-2.5 min-w-0">
         <AvatarConEstado inicial={nombreNegocio.charAt(0).toUpperCase() || 'R'} activo={activo} suspendido={suspendido} />
         <div className="min-w-0">
-          <span className="text-sm font-semibold text-white truncate block">{nombreNegocio}</span>
+          <span className="text-sm font-semibold text-slate-900 truncate block">{nombreNegocio}</span>
           {estado && (
             <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium ${estado.text}`}>
               <span className={`h-1.5 w-1.5 rounded-full ${estado.color}`} />
@@ -126,7 +129,7 @@ function BrandBlock({
           href={`https://cartoca.es/${slug}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-3 flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300"
+          className="mt-3 flex items-center gap-1.5 text-xs font-medium text-brand hover:text-brand-dark"
         >
           Ver mi carta pública
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
@@ -148,13 +151,13 @@ function NavLinks({ isAdmin }: { isAdmin: boolean }) {
           <Link
             key={link.href}
             href={link.href}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
               active
-                ? 'bg-slate-800 text-white shadow-sm shadow-black/20'
-                : 'text-slate-400 hover:bg-slate-800/60 hover:text-white'
+                ? 'bg-brand text-white shadow-[0_6px_18px_rgba(10,132,255,0.35)]'
+                : 'text-slate-600 hover:bg-black/[0.04] hover:text-slate-900'
             }`}
           >
-            <span className={`h-5 w-5 shrink-0 ${active ? 'text-indigo-400' : 'text-slate-500'}`}>
+            <span className={`h-5 w-5 shrink-0 ${active ? 'text-white' : 'text-slate-400'}`}>
               {link.icon}
             </span>
             {link.label}
@@ -163,13 +166,13 @@ function NavLinks({ isAdmin }: { isAdmin: boolean }) {
       })}
       <Link
         href="/dashboard/estadisticas"
-        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors mt-2 border-t border-slate-800 pt-4 ${
+        className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors mt-2 border-t border-black/[0.06] pt-4 ${
           pathname.startsWith("/dashboard/estadisticas")
-            ? "bg-slate-800 text-white shadow-sm shadow-black/20"
-            : "text-slate-400 hover:bg-slate-800/60 hover:text-white"
+            ? "bg-brand text-white shadow-[0_6px_18px_rgba(10,132,255,0.35)]"
+            : "text-slate-600 hover:bg-black/[0.04] hover:text-slate-900"
         }`}
       >
-        <span className={`h-5 w-5 shrink-0 ${pathname.startsWith("/dashboard/estadisticas") ? "text-indigo-400" : "text-slate-500"}`}>
+        <span className={`h-5 w-5 shrink-0 ${pathname.startsWith("/dashboard/estadisticas") ? "text-white" : "text-slate-400"}`}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 19V5M10 19V9M16 19v-6M22 19H2" />
           </svg>
@@ -180,9 +183,9 @@ function NavLinks({ isAdmin }: { isAdmin: boolean }) {
       {isAdmin && (
         <Link
           href="/admin"
-          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white mt-2"
+          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-black/[0.04] hover:text-slate-900 mt-2"
         >
-          <span className="h-5 w-5 shrink-0 text-slate-500">
+          <span className="h-5 w-5 shrink-0 text-slate-400">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 3 4 6.5v5c0 4.7 3.2 8.4 8 9.5 4.8-1.1 8-4.8 8-9.5v-5L12 3Z" />
             </svg>
@@ -196,14 +199,13 @@ function NavLinks({ isAdmin }: { isAdmin: boolean }) {
 
 // Barra de pestañas fija abajo, pensada para manejar la carta desde el
 // móvil con el pulgar: siempre visible, sin menús ocultos que encontrar.
-// Más alta y con más aire que antes, con una "pastilla" de fondo detrás
-// del icono activo y una sombra que la despega del contenido, para que
-// se sienta sólida y no como una línea fina pegada al borde.
+// Ahora en cristal claro, a juego con el resto del panel, con una
+// "pastilla" azul detrás del icono activo.
 function BottomNav() {
   const pathname = usePathname()
   return (
     <nav
-      className="lg:hidden fixed inset-x-0 bottom-0 z-30 bg-slate-900 border-t border-slate-800 shadow-[0_-10px_30px_-8px_rgba(0,0,0,0.45)]"
+      className="lg:hidden fixed inset-x-0 bottom-0 z-30 glass-card rounded-t-2xl border-b-0"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="grid grid-cols-4 px-2 pt-2 pb-1.5">
@@ -217,14 +219,14 @@ function BottomNav() {
             >
               <span
                 className={`flex items-center justify-center h-9 w-9 rounded-xl transition-colors ${
-                  active ? 'bg-indigo-500/15 text-indigo-400' : 'text-slate-500'
+                  active ? 'bg-brand/15 text-brand' : 'text-slate-400'
                 }`}
               >
                 <span className="h-6 w-6 shrink-0">{link.icon}</span>
               </span>
               <span
                 className={`text-[11.5px] font-semibold leading-tight truncate max-w-full px-0.5 ${
-                  active ? 'text-indigo-400' : 'text-slate-500'
+                  active ? 'text-brand' : 'text-slate-500'
                 }`}
               >
                 {link.mobileLabel}
@@ -252,19 +254,25 @@ export default function Sidebar({
 }) {
   return (
     <>
-      {/* Sidebar fija en escritorio */}
-      <aside className="hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 lg:bg-slate-900 lg:border-r lg:border-slate-800 lg:z-20">
+      {/* Sidebar fija en escritorio: se mantiene en el mismo hueco de
+          siempre (ancho fijo a la izquierda), pero ahora "flota" dentro
+          de ese hueco con un margen, en vez de ir a tope de borde, para
+          que se lea como un panel de cristal y no como una barra sólida
+          pegada al lienzo. */}
+      <aside className="hidden lg:flex lg:flex-col lg:gap-3 lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 lg:z-20 lg:p-3">
         <BrandBlock nombreNegocio={nombreNegocio} slug={slug} activo={activo} suspendido={suspendido} />
-        <NavLinks isAdmin={isAdmin} />
-        <div className="px-3 py-4 border-t border-slate-800">
-          <LogoutButton />
+        <div className="glass-card rounded-2xl flex-1 flex flex-col min-h-0">
+          <NavLinks isAdmin={isAdmin} />
+          <div className="px-3 py-4 border-t border-black/[0.06]">
+            <LogoutButton />
+          </div>
         </div>
       </aside>
 
       {/* Cabecera compacta en móvil: marca + accesos rápidos. La navegación
           principal vive en la barra de pestañas de abajo (BottomNav), no
           aquí, para que nunca quede escondida en un menú. */}
-      <header className="lg:hidden sticky top-0 z-30 bg-slate-900 border-b border-slate-800">
+      <header className="lg:hidden sticky top-0 z-30 glass-card rounded-none border-x-0 border-t-0">
         <div className="flex items-center justify-between h-14 px-4">
           <div className="flex items-center gap-2 min-w-0">
             <AvatarConEstado
@@ -273,7 +281,7 @@ export default function Sidebar({
               suspendido={suspendido}
               size={8}
             />
-            <span className="text-sm font-semibold text-white truncate">{nombreNegocio}</span>
+            <span className="text-sm font-semibold text-slate-900 truncate">{nombreNegocio}</span>
           </div>
           <div className="flex items-center gap-0.5 shrink-0">
             {slug && (
@@ -283,7 +291,7 @@ export default function Sidebar({
                 rel="noopener noreferrer"
                 aria-label="Ver mi carta pública"
                 title="Ver mi carta pública"
-                className="flex items-center justify-center h-9 w-9 rounded-lg text-slate-400 hover:bg-white/10 hover:text-white"
+                className="flex items-center justify-center h-9 w-9 rounded-lg text-slate-500 hover:bg-black/[0.05] hover:text-slate-900"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
                   <path d="M7 17 17 7M8 7h9v9" />
@@ -295,7 +303,7 @@ export default function Sidebar({
                 href="/admin"
                 aria-label="Panel admin"
                 title="Panel admin"
-                className="flex items-center justify-center h-9 w-9 rounded-lg text-slate-400 hover:bg-white/10 hover:text-white"
+                className="flex items-center justify-center h-9 w-9 rounded-lg text-slate-500 hover:bg-black/[0.05] hover:text-slate-900"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
                   <path d="M12 3 4 6.5v5c0 4.7 3.2 8.4 8 9.5 4.8-1.1 8-4.8 8-9.5v-5L12 3Z" />

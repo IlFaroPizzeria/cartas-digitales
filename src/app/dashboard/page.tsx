@@ -30,7 +30,7 @@ export default async function DashboardPage() {
   if (!negocio) {
     const pendiente = Boolean(user.user_metadata?.negocio_nombre)
     return (
-      <div className="max-w-md mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center">
+      <div className="max-w-md mx-auto glass-card rounded-2xl p-6 text-center">
         <p className="text-sm text-amber-700">
           {pendiente
             ? 'Estamos terminando de crear tu restaurante. Recarga la página en unos segundos.'
@@ -74,18 +74,18 @@ export default async function DashboardPage() {
         </div>
         <Link
           href="/dashboard/platos/nuevo"
-          className="rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 shadow-sm transition-colors shrink-0"
+          className="rounded-lg bg-brand hover:bg-brand-dark text-white text-sm font-medium px-4 py-2.5 shadow-sm transition-colors shrink-0"
         >
           + Añadir plato
         </Link>
       </div>
 
       {grupos.length === 0 && (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-10 text-center">
+        <div className="glass-card rounded-2xl p-10 text-center">
           <p className="text-sm text-slate-500 mb-4">No tienes platos todavía.</p>
           <Link
             href="/dashboard/platos/nuevo"
-            className="inline-block rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 shadow-sm transition-colors"
+            className="inline-block rounded-lg bg-brand hover:bg-brand-dark text-white text-sm font-medium px-4 py-2.5 shadow-sm transition-colors"
           >
             + Añadir primer plato
           </Link>
@@ -93,9 +93,9 @@ export default async function DashboardPage() {
       )}
 
       {grupos.map((grupo) => (
-        <div key={grupo.nombre} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <div key={grupo.nombre} className="glass-card rounded-2xl p-5">
           <div className="flex items-center justify-between mb-1">
-            <h2 className="text-xs font-bold uppercase tracking-wide text-indigo-700">
+            <h2 className="text-xs font-bold uppercase tracking-wide text-brand-dark">
               {grupo.nombre}
             </h2>
             <span className="text-xs text-slate-400">

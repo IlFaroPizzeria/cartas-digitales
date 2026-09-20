@@ -17,7 +17,7 @@ export default async function CategoriasPage() {
 
   if (!negocio) {
     return (
-      <div className="max-w-md mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center">
+      <div className="max-w-md mx-auto glass-card rounded-2xl p-6 text-center">
         <p className="text-sm text-amber-700">
           Tu usuario todavía no está enlazado a ningún restaurante.
         </p>
@@ -38,7 +38,7 @@ export default async function CategoriasPage() {
         <p className="text-sm text-slate-500">Organiza y ordena las secciones de tu carta</p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+      <div className="glass-card rounded-2xl p-5">
         {(!categorias || categorias.length === 0) && (
           <p className="text-sm text-slate-500 mb-2">Todavía no tienes categorías.</p>
         )}
@@ -54,7 +54,7 @@ export default async function CategoriasPage() {
         </ul>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+      <div className="glass-card rounded-2xl p-5">
         <h2 className="text-sm font-semibold text-slate-900 mb-3">Nueva categoría</h2>
         <NuevaCategoriaForm
           categoriasExistentes={(categorias ?? []).map((c) => c.nombre)}

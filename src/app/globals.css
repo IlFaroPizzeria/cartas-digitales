@@ -14,6 +14,13 @@
   --color-acento-soft: #d9b877;
   --color-texto: #22303f;
   --color-muted: #6b7280;
+
+  /* Acento del panel (dashboard del restaurante y /admin), distinto del
+     tema de la carta pública de arriba -- azul estilo iOS/visionOS para
+     el rediseño "Apple glass" del panel. No confundir con --color-acento,
+     que es el color que cada restaurante elige para SU carta. */
+  --brand: #0a84ff;
+  --brand-dark: #0060df;
 }
 
 @theme inline {
@@ -30,6 +37,12 @@
   --color-carta-acento-soft: var(--color-acento-soft);
   --color-carta-texto: var(--color-texto);
   --color-carta-muted: var(--color-muted);
+
+  /* Registradas como utilidades Tailwind: bg-brand, text-brand,
+     border-brand, ring-brand... (y sus variantes de opacidad, p. ej.
+     bg-brand/10, border-brand/40, que Tailwind genera solo). */
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -43,4 +56,92 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ---------------------------------------------------------------------
+   Panel "Apple glass": paneles de cristal esmerilado sobre un fondo
+   claro con manchas de color difuminadas, en vez de las tarjetas planas
+   blancas de antes. Vive aquí (no en Tailwind inline) porque backdrop-
+   filter y los degradados radiales no tienen una utilidad directa
+   razonable, y así toda la superficie del panel comparte una sola
+   definición en vez de repetirla en cada archivo.
+   ------------------------------------------------------------------- */
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.66);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 1px 1px rgba(30, 30, 40, 0.04),
+    0 16px 36px rgba(30, 30, 45, 0.1);
+}
+
+/* Fondo del panel: manchas pastel muy difuminadas, fijas detrás de todo
+   el contenido (igual que la demo aprobada), para que el cristal de
+   .glass-card tenga algo de color que dejar pasar. */
+.panel-mesh {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background-color: #eef1f6;
+}
+.panel-mesh::before,
+.panel-mesh::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(110px);
+}
+.panel-mesh::before {
+  width: 680px;
+  height: 680px;
+  top: -220px;
+  left: -160px;
+  background: radial-gradient(circle, #cfe0ff, transparent 70%);
+  opacity: 0.9;
+}
+.panel-mesh::after {
+  width: 600px;
+  height: 600px;
+  bottom: -240px;
+  right: -160px;
+  background: radial-gradient(circle, #ffe3d6, transparent 70%);
+  opacity: 0.75;
+}
+
+/* Interruptor estilo iOS, para "Disponible" en PlatoRow -- reemplaza la
+   píldora de texto de antes por algo más parecido a un Ajustes de
+   iPhone: bolita a la derecha en verde cuando está activo, a la
+   izquierda en gris cuando no. */
+.ios-toggle {
+  width: 34px;
+  height: 20px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  background: #34c759;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.03);
+  transition: background-color 0.15s ease;
+}
+.ios-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: right 0.15s ease, left 0.15s ease;
+}
+.ios-toggle.off {
+  background: rgba(0, 0, 0, 0.14);
+}
+.ios-toggle.off::after {
+  right: auto;
+  left: 2px;
 }

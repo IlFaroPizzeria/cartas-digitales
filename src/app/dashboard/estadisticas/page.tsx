@@ -12,7 +12,7 @@ const IDIOMA_LABEL: Record<string, string> = {
 
 function StatTile({ label, value }: { label: string; value: number }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 text-center">
+    <div className="glass-card rounded-2xl p-4 text-center">
       <p className="text-2xl font-semibold text-slate-900 tabular-nums">{value}</p>
       <p className="text-xs text-slate-500 mt-0.5">{label}</p>
     </div>
@@ -34,7 +34,7 @@ export default async function EstadisticasPage() {
 
   if (!negocio) {
     return (
-      <div className="max-w-md mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center">
+      <div className="max-w-md mx-auto glass-card rounded-2xl p-6 text-center">
         <p className="text-sm text-amber-700">
           Tu usuario todavía no está enlazado a ningún restaurante.
         </p>
@@ -93,7 +93,7 @@ export default async function EstadisticasPage() {
         <StatTile label="Desde siempre" value={aperturasTotal ?? 0} />
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+      <div className="glass-card rounded-2xl p-5">
         <h2 className="text-sm font-semibold text-slate-900 mb-1">Idiomas más usados</h2>
         <p className="text-xs text-slate-500 mb-4">Últimos 30 días</p>
         {idiomasOrdenados.length === 0 ? (
@@ -115,7 +115,7 @@ export default async function EstadisticasPage() {
                     </span>
                   </div>
                   <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                    <div className="h-full rounded-full bg-indigo-500" style={{ width: `${pct}%` }} />
+                    <div className="h-full rounded-full bg-brand" style={{ width: `${pct}%` }} />
                   </div>
                 </li>
               )

@@ -29,7 +29,7 @@ export default async function CuentaPage() {
 
       <Link
         href="/dashboard/estadisticas"
-        className="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:border-slate-300 transition-colors"
+        className="flex items-center justify-between glass-card rounded-2xl p-5 hover:bg-white/80 transition-colors"
       >
         <div>
           <h2 className="text-sm font-semibold text-slate-900">Estadísticas</h2>

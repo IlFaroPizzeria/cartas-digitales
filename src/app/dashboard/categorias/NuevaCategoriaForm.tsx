@@ -65,7 +65,7 @@ export default function NuevaCategoriaForm({
             name="categoriaId"
             required
             defaultValue=""
-            className="flex-1 rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            className="flex-1 rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand"
           >
             <option value="" disabled>
               Elige una categoría
@@ -79,7 +79,7 @@ export default function NuevaCategoriaForm({
           <button
             type="submit"
             disabled={loading}
-            className="rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 text-sm font-medium shadow-sm transition-colors disabled:opacity-50"
+            className="rounded-lg bg-brand hover:bg-brand-dark text-white px-4 py-2.5 text-sm font-medium shadow-sm transition-colors disabled:opacity-50"
           >
             {loading ? "Creando..." : "Crear"}
           </button>
@@ -96,12 +96,12 @@ export default function NuevaCategoriaForm({
             required
             maxLength={40}
             placeholder="Nombre de la categoría (ej. Sushi)"
-            className="flex-1 rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            className="flex-1 rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand"
           />
           <button
             type="submit"
             disabled={loading}
-            className="rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 text-sm font-medium shadow-sm transition-colors disabled:opacity-50"
+            className="rounded-lg bg-brand hover:bg-brand-dark text-white px-4 py-2.5 text-sm font-medium shadow-sm transition-colors disabled:opacity-50"
           >
             {loading ? "Creando..." : "Crear"}
           </button>
@@ -118,7 +118,7 @@ export default function NuevaCategoriaForm({
             <button
               type="button"
               onClick={() => setModo("personalizada")}
-              className="text-xs font-medium text-indigo-600 hover:text-indigo-700"
+              className="text-xs font-medium text-brand hover:text-brand-dark"
             >
               ¿No la encuentras? Crea una categoría con otro nombre
             </button>
@@ -128,7 +128,7 @@ export default function NuevaCategoriaForm({
             <button
               type="button"
               onClick={() => setModo("lista")}
-              className="text-xs font-medium text-indigo-600 hover:text-indigo-700"
+              className="text-xs font-medium text-brand hover:text-brand-dark"
             >
               Elegir de la lista de categorías habituales
             </button>

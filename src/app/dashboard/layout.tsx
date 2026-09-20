@@ -47,38 +47,44 @@ export default async function DashboardLayout({
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-slate-100">
-        <Sidebar
-          nombreNegocio={negocio?.nombre ?? "Panel"}
-          slug={negocio?.slug ?? null}
-          isAdmin={!!admin}
-          activo={negocio?.activo ?? null}
-          suspendido={negocio?.suspendido ?? false}
-        />
-        <div className="lg:pl-64">
-          {negocio && negocio.suspendido ? (
-            <div className="bg-red-50 border-b border-red-200">
-              <div className="max-w-3xl mx-auto px-4 py-2.5 text-sm text-red-800">
-                Tu cuenta está suspendida por impago. Tu carta pública no se ve
-                y no se pueden guardar cambios hasta que se regularice — contacta
-                con nosotros.
-              </div>
-            </div>
-          ) : (
-            negocio &&
-            !negocio.activo && (
-              <div className="bg-amber-50 border-b border-amber-200">
-                <div className="max-w-3xl mx-auto px-4 py-2.5 text-sm text-amber-800">
-                  Tu carta está pendiente de aprobación. Puedes configurarla
-                  mientras tanto — te avisaremos en cuanto esté activa y visible
-                  al público.
+      <div className="min-h-screen relative">
+        {/* Fondo fijo con manchas de color difuminadas, detrás de todo
+            (sidebar y contenido incluidos): es lo que da color al
+            cristal esmerilado de .glass-card en toda la app. */}
+        <div className="panel-mesh" />
+        <div className="relative z-[1]">
+          <Sidebar
+            nombreNegocio={negocio?.nombre ?? "Panel"}
+            slug={negocio?.slug ?? null}
+            isAdmin={!!admin}
+            activo={negocio?.activo ?? null}
+            suspendido={negocio?.suspendido ?? false}
+          />
+          <div className="lg:pl-64">
+            {negocio && negocio.suspendido ? (
+              <div className="max-w-3xl mx-auto px-4 pt-3 lg:pt-4">
+                <div className="glass-card rounded-2xl px-4 py-2.5 text-sm text-red-700" style={{ borderColor: 'rgba(220,38,38,0.25)' }}>
+                  Tu cuenta está suspendida por impago. Tu carta pública no se ve
+                  y no se pueden guardar cambios hasta que se regularice — contacta
+                  con nosotros.
                 </div>
               </div>
-            )
-          )}
-          <main className="max-w-3xl mx-auto px-4 pt-6 pb-32 lg:pt-8 lg:pb-8">
-            {children}
-          </main>
+            ) : (
+              negocio &&
+              !negocio.activo && (
+                <div className="max-w-3xl mx-auto px-4 pt-3 lg:pt-4">
+                  <div className="glass-card rounded-2xl px-4 py-2.5 text-sm text-amber-700" style={{ borderColor: 'rgba(217,119,6,0.25)' }}>
+                    Tu carta está pendiente de aprobación. Puedes configurarla
+                    mientras tanto — te avisaremos en cuanto esté activa y visible
+                    al público.
+                  </div>
+                </div>
+              )
+            )}
+            <main className="max-w-3xl mx-auto px-4 pt-6 pb-32 lg:pt-8 lg:pb-8">
+              {children}
+            </main>
+          </div>
         </div>
       </div>
     </ToastProvider>

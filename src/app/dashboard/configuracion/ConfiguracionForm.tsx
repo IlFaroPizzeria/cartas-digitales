@@ -156,7 +156,7 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
   }
 
   const inputClass =
-    "w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500";
+    "w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand";
 
   return (
     <form action={handleSubmit} className="space-y-6">
@@ -271,7 +271,7 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
                 onClick={() => setPlantilla(p.id)}
                 className={`text-left rounded-xl border-2 p-3 transition-colors ${
                   activa
-                    ? "border-indigo-500 bg-indigo-50/50"
+                    ? "border-brand bg-brand/5"
                     : "border-slate-200 hover:border-slate-300"
                 }`}
               >
@@ -279,7 +279,7 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
                 <p className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
                   {p.nombre}
                   {activa && (
-                    <span className="text-[10px] font-semibold text-indigo-600 uppercase tracking-wide">
+                    <span className="text-[10px] font-semibold text-brand uppercase tracking-wide">
                       Activa
                     </span>
                   )}
@@ -308,7 +308,7 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
             onClick={() => setMostrarBarraCategorias(true)}
             className={`text-left rounded-xl border-2 p-3 transition-colors ${
               mostrarBarraCategorias
-                ? "border-indigo-500 bg-indigo-50/50"
+                ? "border-brand bg-brand/5"
                 : "border-slate-200 hover:border-slate-300"
             }`}
           >
@@ -323,7 +323,7 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
             <p className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
               Categorías arriba
               {mostrarBarraCategorias && (
-                <span className="text-[10px] font-semibold text-indigo-600 uppercase tracking-wide">
+                <span className="text-[10px] font-semibold text-brand uppercase tracking-wide">
                   Activa
                 </span>
               )}
@@ -338,7 +338,7 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
             onClick={() => setMostrarBarraCategorias(false)}
             className={`text-left rounded-xl border-2 p-3 transition-colors ${
               !mostrarBarraCategorias
-                ? "border-indigo-500 bg-indigo-50/50"
+                ? "border-brand bg-brand/5"
                 : "border-slate-200 hover:border-slate-300"
             }`}
           >
@@ -351,7 +351,7 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
             <p className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
               Carta apilada
               {!mostrarBarraCategorias && (
-                <span className="text-[10px] font-semibold text-indigo-600 uppercase tracking-wide">
+                <span className="text-[10px] font-semibold text-brand uppercase tracking-wide">
                   Activa
                 </span>
               )}
@@ -424,7 +424,7 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
                 }
                 className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
                   activo
-                    ? "bg-indigo-50 text-indigo-700 border-indigo-300"
+                    ? "bg-brand/10 text-brand-dark border-brand/40"
                     : bloqueado
                       ? "bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed"
                       : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
@@ -449,7 +449,7 @@ export default function ConfiguracionForm({ negocio }: { negocio: Negocio }) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full sm:w-auto rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 text-base font-medium shadow-sm transition-colors disabled:opacity-50"
+        className="w-full sm:w-auto rounded-lg bg-brand hover:bg-brand-dark text-white px-6 py-3 text-base font-medium shadow-sm transition-colors disabled:opacity-50"
       >
         {loading ? "Guardando..." : "Guardar cambios"}
       </button>

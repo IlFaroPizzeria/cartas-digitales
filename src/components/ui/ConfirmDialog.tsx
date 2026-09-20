@@ -65,7 +65,7 @@ export default function ConfirmDialog({
             className={`rounded-lg px-3.5 py-2 text-sm font-semibold text-white shadow-sm disabled:opacity-50 ${
               danger
                 ? "bg-red-600 hover:bg-red-700"
-                : "bg-indigo-600 hover:bg-indigo-700"
+                : "bg-brand hover:bg-brand-dark"
             }`}
           >
             {pending ? "Eliminando…" : confirmLabel}
