@@ -18,7 +18,7 @@ export default async function DashboardLayout({
 
   let { data: negocio } = await supabase
     .from("negocios")
-    .select("nombre, activo, slug, suspendido")
+    .select("nombre, activo, slug, suspendido, logo_url")
     .eq("owner_id", user.id)
     .maybeSingle();
 
@@ -32,7 +32,7 @@ export default async function DashboardLayout({
       await registrarNegocio(nombrePendiente);
       const { data: negocioCreado } = await supabase
         .from("negocios")
-        .select("nombre, activo, slug, suspendido")
+        .select("nombre, activo, slug, suspendido, logo_url")
         .eq("owner_id", user.id)
         .maybeSingle();
       negocio = negocioCreado;
@@ -56,6 +56,7 @@ export default async function DashboardLayout({
           <Sidebar
             nombreNegocio={negocio?.nombre ?? "Panel"}
             slug={negocio?.slug ?? null}
+            logoUrl={negocio?.logo_url ?? null}
             isAdmin={!!admin}
             activo={negocio?.activo ?? null}
             suspendido={negocio?.suspendido ?? false}

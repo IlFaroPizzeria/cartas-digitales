@@ -50,9 +50,20 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-6">
-          <span className="flex items-center justify-center h-11 w-11 rounded-xl bg-indigo-600 text-white text-lg font-bold shadow-sm">
-            C
-          </span>
+          <svg
+            viewBox="0 0 32 32"
+            className="h-11 w-11 rounded-xl shadow-sm"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-label="Cartoca"
+          >
+            <rect width="32" height="32" rx="8" fill="#2E5C4C" />
+            <g fill="none" stroke="#F7F6EF" strokeWidth="2.4" strokeLinecap="round">
+              <path d="M8 16.8a8 8 0 0 1 16 0" />
+              <path d="M11.2 16.8a4.8 4.8 0 0 1 9.6 0" />
+              <circle cx="16" cy="16.8" r="1.1" fill="#F7F6EF" stroke="none" />
+              <path d="M16 20.4v4.4" />
+            </g>
+          </svg>
           <h1 className="mt-3 text-lg font-semibold text-slate-900">Portal de clientes</h1>
           <p className="text-sm text-slate-500">Gestiona tu carta digital de Cartoca</p>
         </div>

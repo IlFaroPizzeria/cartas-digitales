@@ -69,11 +69,16 @@ function estadoNegocio(activo: boolean | null, suspendido: boolean) {
 
 function AvatarConEstado({
   inicial,
+  logoUrl,
   activo,
   suspendido,
   size = 9,
 }: {
   inicial: string
+  // Logo real del restaurante (negocio.logo_url), el mismo que usa su
+  // carta pública. Si todavía no ha subido uno, se cae en la inicial
+  // sobre un degradado -- nunca se deja el avatar vacío.
+  logoUrl?: string | null
   activo: boolean | null
   suspendido: boolean
   size?: 8 | 9
@@ -82,12 +87,21 @@ function AvatarConEstado({
   const dimensiones = size === 9 ? 'h-9 w-9' : 'h-8 w-8'
   return (
     <span className={`relative shrink-0 ${dimensiones}`}>
-      <span
-        className={`flex items-center justify-center ${dimensiones} rounded-xl text-white text-sm font-semibold`}
-        style={{ background: 'linear-gradient(150deg, #4fa8ff, var(--brand))', boxShadow: '0 6px 16px rgba(10,132,255,0.35)' }}
-      >
-        {inicial}
-      </span>
+      {logoUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={logoUrl}
+          alt=""
+          className={`${dimensiones} rounded-xl object-cover bg-white shadow-sm`}
+        />
+      ) : (
+        <span
+          className={`flex items-center justify-center ${dimensiones} rounded-xl text-white text-sm font-semibold`}
+          style={{ background: 'linear-gradient(150deg, #4fa8ff, var(--brand))', boxShadow: '0 6px 16px rgba(10,132,255,0.35)' }}
+        >
+          {inicial}
+        </span>
+      )}
       {estado && (
         <span
           className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${estado.color}`}
@@ -101,11 +115,13 @@ function AvatarConEstado({
 function BrandBlock({
   nombreNegocio,
   slug,
+  logoUrl,
   activo,
   suspendido,
 }: {
   nombreNegocio: string
   slug: string | null
+  logoUrl: string | null
   activo: boolean | null
   suspendido: boolean
 }) {
@@ -113,7 +129,7 @@ function BrandBlock({
   return (
     <div className="glass-card rounded-2xl px-5 pt-5 pb-4">
       <div className="flex items-center gap-2.5 min-w-0">
-        <AvatarConEstado inicial={nombreNegocio.charAt(0).toUpperCase() || 'R'} activo={activo} suspendido={suspendido} />
+        <AvatarConEstado inicial={nombreNegocio.charAt(0).toUpperCase() || 'R'} logoUrl={logoUrl} activo={activo} suspendido={suspendido} />
         <div className="min-w-0">
           <span className="text-sm font-semibold text-slate-900 truncate block">{nombreNegocio}</span>
           {estado && (
@@ -242,12 +258,14 @@ function BottomNav() {
 export default function Sidebar({
   nombreNegocio,
   slug,
+  logoUrl = null,
   isAdmin,
   activo = null,
   suspendido = false,
 }: {
   nombreNegocio: string
   slug: string | null
+  logoUrl?: string | null
   isAdmin: boolean
   activo?: boolean | null
   suspendido?: boolean
@@ -260,7 +278,7 @@ export default function Sidebar({
           que se lea como un panel de cristal y no como una barra sólida
           pegada al lienzo. */}
       <aside className="hidden lg:flex lg:flex-col lg:gap-3 lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 lg:z-20 lg:p-3">
-        <BrandBlock nombreNegocio={nombreNegocio} slug={slug} activo={activo} suspendido={suspendido} />
+        <BrandBlock nombreNegocio={nombreNegocio} slug={slug} logoUrl={logoUrl} activo={activo} suspendido={suspendido} />
         <div className="glass-card rounded-2xl flex-1 flex flex-col min-h-0">
           <NavLinks isAdmin={isAdmin} />
           <div className="px-3 py-4 border-t border-black/[0.06]">
@@ -277,6 +295,7 @@ export default function Sidebar({
           <div className="flex items-center gap-2 min-w-0">
             <AvatarConEstado
               inicial={nombreNegocio.charAt(0).toUpperCase() || 'R'}
+              logoUrl={logoUrl}
               activo={activo}
               suspendido={suspendido}
               size={8}
