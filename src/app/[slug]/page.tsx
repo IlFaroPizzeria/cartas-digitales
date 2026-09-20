@@ -52,8 +52,10 @@ type PlatoConCategoriaRaw = {
 
 // El favicon por restaurante (logo si lo tiene, si no el icono por
 // defecto de Cartoca) se resuelve aparte, en src/app/[slug]/icon.tsx:
-// es la vía que Next.js recomienda para iconos por ruta, y evita que
-// conviva de forma ambigua con metadata.icons y el favicon.ico global.
+// es la vía que Next.js recomienda para iconos por ruta. Ojo: para que
+// gane, esta página no debe declarar ningún otro icono -- ni aquí en
+// metadata.icons, ni dejando un favicon.ico dentro de src/app/ (Next.js
+// lo inyecta en TODAS las páginas y el navegador se quedaba con ese).
 export async function generateMetadata({
   params,
 }: {

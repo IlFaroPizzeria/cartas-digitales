@@ -1,5 +1,3 @@
-import { readFile } from 'node:fs/promises'
-import path from 'node:path'
 import sharp from 'sharp'
 import { getNegocioCarta } from '@/lib/negocio-carta'
 
@@ -12,18 +10,30 @@ export const size = { width: 32, height: 32 }
 
 // Sin esto, el navegador (y cualquier CDN por delante) puede quedarse
 // con una respuesta vieja de esta ruta durante mucho tiempo -- a
-// diferencia de src/app/icon.svg (un archivo estático con su propio
+// diferencia de src/app/icon.png (un archivo estático, con su propio
 // hash de contenido en la URL), esta es una función que se ejecuta en
 // cada petición, así que forzamos la misma política de "revalida
-// siempre" que ya usan favicon.ico e icon.svg en la raíz.
+// siempre".
 const CACHE_HEADERS = { 'Cache-Control': 'public, max-age=0, must-revalidate' }
 
-// Icono de Cartoca por defecto: el mismo que ya vive en
-// src/app/icon.svg, servido tal cual para los restaurantes que
-// todavía no han subido su logo.
-async function iconoPorDefecto() {
-  const buffer = await readFile(path.join(process.cwd(), 'src/app/icon.svg'))
-  return new Response(new Uint8Array(buffer), {
+// Icono de Cartoca por defecto, para los restaurantes que todavía no
+// han subido su logo. Va escrito aquí en vez de leerse del disco: en
+// Vercel cada ruta se empaqueta solo con los archivos que Next.js
+// detecta que usa, y un readFile() con una ruta montada a mano no
+// entra siempre en ese paquete -- justo el tipo de cosa que funciona
+// en local y se cae en producción.
+const ICONO_CARTOCA = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="8" fill="#0a84ff"/>
+  <g fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round">
+    <path d="M8 16.8a8 8 0 0 1 16 0"/>
+    <path d="M11.2 16.8a4.8 4.8 0 0 1 9.6 0"/>
+    <circle cx="16" cy="16.8" r="1.1" fill="#FFFFFF" stroke="none"/>
+    <path d="M16 20.4v4.4"/>
+  </g>
+</svg>`
+
+function iconoPorDefecto() {
+  return new Response(ICONO_CARTOCA, {
     headers: { 'Content-Type': 'image/svg+xml', ...CACHE_HEADERS },
   })
 }
