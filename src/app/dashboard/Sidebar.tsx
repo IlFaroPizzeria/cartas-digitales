@@ -127,7 +127,7 @@ function BrandBlock({
 }) {
   const estado = estadoNegocio(activo, suspendido)
   return (
-    <div className="glass-card rounded-2xl px-5 pt-5 pb-4">
+    <div className="glass-chrome rounded-2xl px-5 pt-5 pb-4">
       <div className="flex items-center gap-2.5 min-w-0">
         <AvatarConEstado inicial={nombreNegocio.charAt(0).toUpperCase() || 'R'} logoUrl={logoUrl} activo={activo} suspendido={suspendido} />
         <div className="min-w-0">
@@ -221,7 +221,7 @@ function BottomNav() {
   const pathname = usePathname()
   return (
     <nav
-      className="lg:hidden fixed inset-x-0 bottom-0 z-30 glass-card rounded-t-2xl border-b-0"
+      className="lg:hidden fixed inset-x-0 bottom-0 z-30 glass-chrome rounded-t-2xl border-b-0"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="grid grid-cols-4 px-2 pt-2 pb-1.5">
@@ -279,7 +279,7 @@ export default function Sidebar({
           pegada al lienzo. */}
       <aside className="hidden lg:flex lg:flex-col lg:gap-3 lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 lg:z-20 lg:p-3">
         <BrandBlock nombreNegocio={nombreNegocio} slug={slug} logoUrl={logoUrl} activo={activo} suspendido={suspendido} />
-        <div className="glass-card rounded-2xl flex-1 flex flex-col min-h-0">
+        <div className="glass-chrome rounded-2xl flex-1 flex flex-col min-h-0">
           <NavLinks isAdmin={isAdmin} />
           <div className="px-3 py-4 border-t border-black/[0.06]">
             <LogoutButton />
@@ -290,7 +290,7 @@ export default function Sidebar({
       {/* Cabecera compacta en móvil: marca + accesos rápidos. La navegación
           principal vive en la barra de pestañas de abajo (BottomNav), no
           aquí, para que nunca quede escondida en un menú. */}
-      <header className="lg:hidden sticky top-0 z-30 glass-card rounded-none border-x-0 border-t-0">
+      <header className="lg:hidden sticky top-0 z-30 glass-chrome rounded-none border-x-0 border-t-0">
         <div className="flex items-center justify-between h-14 px-4">
           <div className="flex items-center gap-2 min-w-0">
             <AvatarConEstado

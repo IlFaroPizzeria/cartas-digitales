@@ -67,11 +67,34 @@ body {
    definición en vez de repetirla en cada archivo.
    ------------------------------------------------------------------- */
 
+/* .glass-card: la mayoría de las tarjetas del panel (listas de
+   platos, formularios, estadísticas...). Se pintan MUCHAS a la vez en
+   una sola página (una por categoría, por ejemplo) y se desplazan con
+   el resto del contenido, así que llevan un fondo blanco translúcido
+   SIN backdrop-filter -- desenfocar en tiempo real detrás de docenas
+   de tarjetas a la vez es lo que iba de golpe: cada backdrop-filter
+   obliga al navegador a recalcular el desenfoque en cada fotograma
+   mientras se hace scroll, y con 10-20 tarjetas en pantalla (una
+   carta con muchas categorías) eso se nota muchísimo, sobre todo en
+   el móvil. Un blanco translúcido algo más opaco da un resultado
+   visualmente parecido por una fracción del coste. */
 .glass-card {
-  background: rgba(255, 255, 255, 0.66);
-  backdrop-filter: blur(24px) saturate(1.5);
-  -webkit-backdrop-filter: blur(24px) saturate(1.5);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 1px 1px rgba(30, 30, 40, 0.04),
+    0 16px 36px rgba(30, 30, 45, 0.08);
+}
+
+/* .glass-chrome: SOLO la navegación fija (sidebar, cabecera y barra
+   inferior móvil) -- como mucho 2-3 elementos en pantalla a la vez, y
+   son justo el caso donde el desenfoque real aporta algo (el
+   contenido se desplaza debajo). Aquí sí vale la pena el coste. */
+.glass-chrome {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.85);
   box-shadow:
     0 1px 1px rgba(30, 30, 40, 0.04),
     0 16px 36px rgba(30, 30, 45, 0.1);
