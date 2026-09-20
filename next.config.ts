@@ -40,6 +40,24 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // /favicon.ico es la ruta "a ciegas" que muchos navegadores piden por
+  // su cuenta, sin mirar las etiquetas <link> de la página. Durante meses
+  // ahí vivió el icono por defecto que venía con Next.js, y los
+  // navegadores lo guardaron: el favicon se cachea en una base aparte,
+  // con su propia caducidad, que no se limpia al recargar ni hace caso a
+  // Cache-Control. Como la URL no puede cambiar (es una convención), la
+  // redirigimos al icono actual, que sí lleva hash de contenido en la
+  // URL. Temporal (307) a propósito: así el navegador vuelve a
+  // preguntar en vez de quedarse con el destino guardado para siempre.
+  async redirects() {
+    return [
+      {
+        source: '/favicon.ico',
+        destination: '/icon.png',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 // Sube sourcemaps a Sentry en el build de Vercel para que los stack
