@@ -56,11 +56,11 @@ export default function LoginPage() {
             xmlns="http://www.w3.org/2000/svg"
             aria-label="Cartoca"
           >
-            <rect width="32" height="32" rx="8" fill="#2E5C4C" />
-            <g fill="none" stroke="#F7F6EF" strokeWidth="2.4" strokeLinecap="round">
+            <rect width="32" height="32" rx="8" fill="#0a84ff" />
+            <g fill="none" stroke="#FFFFFF" strokeWidth="2.4" strokeLinecap="round">
               <path d="M8 16.8a8 8 0 0 1 16 0" />
               <path d="M11.2 16.8a4.8 4.8 0 0 1 9.6 0" />
-              <circle cx="16" cy="16.8" r="1.1" fill="#F7F6EF" stroke="none" />
+              <circle cx="16" cy="16.8" r="1.1" fill="#FFFFFF" stroke="none" />
               <path d="M16 20.4v4.4" />
             </g>
           </svg>
