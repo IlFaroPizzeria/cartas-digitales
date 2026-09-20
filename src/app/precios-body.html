@@ -2,8 +2,8 @@
   <header class="page-hero page-enter">
     <div class="wrap">
       <span class="eyebrow">Precios</span>
-      <h1>Un pago único, sin permanencia ni cuotas sorpresa</h1>
-      <p class="page-hero-lead">Ajusta la calculadora y te preparamos el presupuesto exacto para tu restaurante.</p>
+      <h1>Tu carta, tu plan</h1>
+      <p class="page-hero-lead">Sin permanencia: eliges tu plan, lo cambias cuando quieras y te decimos el precio exacto al momento.</p>
     </div>
   </header>
 
@@ -13,32 +13,80 @@
     <div class="wrap">
       <div class="section-head reveal">
         <span class="eyebrow">Precios</span>
-        <h2>Un pago único, sin permanencia ni cuotas sorpresa</h2>
-        <p>Pagas una vez por poner en marcha tu carta digital. El acceso a la plataforma es opcional y mensual, tú decides si lo activas.</p>
+        <h2>Tres formas de tener tu carta digital</h2>
+        <p>Todos los planes incluyen el panel para editar tu carta tú mismo, en el momento que quieras.</p>
       </div>
 
-      <div class="pricing-grid">
-        <div class="plan-card reveal reveal-1">
-          <span class="plan-eyebrow mono">Incluido de base</span>
-          <h3>Carta digital Cartoca</h3>
+      <div class="plans-grid reveal reveal-1">
+        <button type="button" class="plan-select" id="plan-admin" data-plan="admin" aria-pressed="false">
+          <span class="plan-radio" aria-hidden="true"></span>
+          <span class="plan-eyebrow mono">Ya tienes tu carta</span>
+          <h3>Solo plataforma</h3>
           <div class="plan-price">
-            <span class="amount mono">50€</span>
-            <span class="period">pago único</span>
+            <span class="amount mono">25€</span>
+            <span class="period">/mes</span>
           </div>
           <ul class="plan-feats">
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>Digitalización completa de tu carta actual</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>Español + 2 idiomas incluidos (idiomas extra desde 5€/mes)</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>Diseño a tu medida, sin plantillas genéricas</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>Soporte por WhatsApp en menos de 24h</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>Panel para editar tu carta cuando quieras</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>QR y enlace incluidos, sin coste extra</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>Todos los idiomas, sin límite</li>
           </ul>
+        </button>
+
+        <button type="button" class="plan-select active" id="plan-qr" data-plan="qr" aria-pressed="true">
+          <span class="plan-badge">Más elegido</span>
+          <span class="plan-radio" aria-hidden="true"></span>
+          <span class="plan-eyebrow mono">Digitalizamos tu carta</span>
+          <h3>Digitalización + QR</h3>
+          <div class="plan-price">
+            <span class="amount mono">30€</span>
+            <span class="period">/mes</span>
+          </div>
+          <div class="plan-entrada">+ 50€ de entrada, pago único</div>
+          <ul class="plan-feats">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>Digitalizamos tu carta entera: fotos, textos y traducción</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>Diseño a tu medida, listo en días</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>Panel + QR incluidos para siempre</li>
+          </ul>
+        </button>
+
+        <button type="button" class="plan-select" id="plan-nfc" data-plan="nfc" aria-pressed="false">
+          <span class="plan-radio" aria-hidden="true"></span>
+          <span class="plan-eyebrow mono">Digitalizamos tu carta</span>
+          <h3>Digitalización + NFC</h3>
+          <div class="plan-price">
+            <span class="amount mono">30€</span>
+            <span class="period">/mes</span>
+          </div>
+          <div class="plan-entrada">+ 50€ de entrada, pago único</div>
+          <ul class="plan-feats">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>Todo lo del plan QR</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>Tarjetas NFC para mesas o reseñas, pago único aparte</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>Toca y aparece, sin que nadie escanee nada</li>
+          </ul>
+        </button>
+      </div>
+
+      <div class="calc-card reveal reveal-2">
+        <div class="calc-title">
+          <h3>Tu carta con tu nombre</h3>
+          <span>Escribe tu restaurante y mira cómo quedaría</span>
         </div>
 
-        <div class="calc-card reveal reveal-2">
-          <div class="calc-title">
-            <h3>Calcula tu presupuesto</h3>
-            <span>Ajusta y te preparamos el precio exacto</span>
-          </div>
+        <div class="calc-row calc-row-input">
+          <label for="restoName" class="c-label">Nombre de tu restaurante</label>
+          <input id="restoName" class="calc-input" type="text" placeholder="Ej. La Caleta" maxlength="40" autocomplete="off" />
+        </div>
 
+        <div class="qr-preview-block">
+          <canvas id="precioQrCanvas" width="104" height="104"></canvas>
+          <div>
+            <div class="qr-preview-url mono" id="precioQrUrl">cartoca.es/tu-restaurante</div>
+            <div class="qr-preview-note">Así se vería tu QR. Lo activamos en cuanto empecemos.</div>
+          </div>
+        </div>
+
+        <div id="nfcExtras" style="display:none;">
           <div class="calc-row">
             <div>
               <div class="c-label">Tarjetas NFC de menú</div>
@@ -53,7 +101,7 @@
 
           <div class="calc-row">
             <div>
-              <div class="c-label">Tarjetas NFC de reseñas</div>
+              <div class="c-label">Tarjetas NFC de reseñas de Google</div>
               <div class="c-help">30€/ud · 25€/ud a partir de 5 tarjetas</div>
             </div>
             <div class="stepper">
@@ -62,30 +110,26 @@
               <button type="button" id="reviewPlus" aria-label="Añadir tarjeta de reseñas">+</button>
             </div>
           </div>
-
-          <div class="calc-row">
-            <div>
-              <div class="c-label">Acceso a la plataforma</div>
-              <div class="c-help">Desde 25€/mes · el precio final depende de las funciones que actives en tu carta</div>
-            </div>
-            <button type="button" class="toggle" id="maintToggle" role="switch" aria-pressed="false" aria-label="Activar acceso a la plataforma"></button>
-          </div>
-
-          <div class="calc-total">
-            <span class="t-label">Pago único estimado</span>
-            <span class="t-amount mono" id="totalAmount">158€</span>
-          </div>
-          <div class="calc-sub" id="maintLine" style="display:none;">
-            <span>+ Acceso a la plataforma</span>
-            <span class="mono">desde 25€/mes</span>
-          </div>
-
-          <a class="btn btn-primary btn-block" id="calc-wa" href="#" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.09c-.25.7-1.44 1.34-1.98 1.4-.51.06-1.05.29-3.52-.74-2.98-1.24-4.89-4.25-5.04-4.45-.15-.2-1.2-1.6-1.2-3.05 0-1.45.76-2.16 1.03-2.46.27-.3.6-.37.8-.37.2 0 .4 0 .58.01.19.01.44-.07.68.52.25.6.85 2.07.92 2.22.07.15.12.33.02.53-.1.2-.15.32-.3.5-.15.17-.31.39-.44.52-.15.15-.3.31-.13.6.17.3.76 1.26 1.64 2.04 1.13 1 2.08 1.32 2.38 1.47.3.15.48.13.66-.08.18-.2.76-.88.96-1.19.2-.3.4-.25.68-.15.27.1 1.75.83 2.05.98.3.15.5.22.57.35.08.13.08.75-.17 1.45Z"/></svg>
-            Pedir presupuesto por WhatsApp
-          </a>
-          <span class="calc-note">Precios reales de Cartoca a fecha de hoy. El acceso a la plataforma varía según las funciones que actives (idiomas, reseñas, etc.) — te damos el precio exacto al hablar contigo.</span>
         </div>
+
+        <div class="calc-total">
+          <span class="t-label" id="totalLabel">Digitalización + QR</span>
+          <span class="t-amount mono" id="totalAmount">30€/mes</span>
+        </div>
+        <div class="calc-sub" id="entradaSub" style="display:flex;">
+          <span>+ Entrada (digitalización)</span>
+          <span class="mono" id="entradaAmount">50€ pago único</span>
+        </div>
+        <div class="calc-sub" id="nfcSub" style="display:none;">
+          <span>+ Tarjetas NFC</span>
+          <span class="mono" id="nfcAmount">0€ pago único</span>
+        </div>
+
+        <a class="btn btn-primary btn-block" id="calc-wa" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.09c-.25.7-1.44 1.34-1.98 1.4-.51.06-1.05.29-3.52-.74-2.98-1.24-4.89-4.25-5.04-4.45-.15-.2-1.2-1.6-1.2-3.05 0-1.45.76-2.16 1.03-2.46.27-.3.6-.37.8-.37.2 0 .4 0 .58.01.19.01.44-.07.68.52.25.6.85 2.07.92 2.22.07.15.12.33.02.53-.1.2-.15.32-.3.5-.15.17-.31.39-.44.52-.15.15-.3.31-.13.6.17.3.76 1.26 1.64 2.04 1.13 1 2.08 1.32 2.38 1.47.3.15.48.13.66-.08.18-.2.76-.88.96-1.19.2-.3.4-.25.68-.15.27.1 1.75.83 2.05.98.3.15.5.22.57.35.08.13.08.75-.17 1.45Z"/></svg>
+          Pedir presupuesto por WhatsApp
+        </a>
+        <span class="calc-note">Precios reales de Cartoca a fecha de hoy. Sin permanencia: cambias o cancelas tu plan cuando quieras.</span>
       </div>
     </div>
   </section>

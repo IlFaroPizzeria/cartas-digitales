@@ -7,7 +7,7 @@ const bodyHtml = fs.readFileSync(path.join(process.cwd(), 'src/app/precios-body.
 
 export const metadata: Metadata = {
   title: 'Precios | Cartoca',
-  description: 'Un pago único desde 50€, sin permanencia. Calcula el presupuesto exacto para tu restaurante.',
+  description: 'Planes desde 25€/mes, sin permanencia. Elige cómo compartir tu carta y calcula el precio exacto.',
 }
 
 export default function PreciosPage() {

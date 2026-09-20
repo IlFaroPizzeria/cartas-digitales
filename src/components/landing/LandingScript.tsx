@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import QRCode from "qrcode";
 
 // Antes esto vivía en landing-script.js, cargado con un <script> dentro del
 // layout compartido de (marketing). El problema: ese layout no se vuelve a
@@ -67,12 +68,23 @@ export default function LandingScript() {
 
     // Calculadora — solo presente en /precios. Precios reales de Cartoca.
     const menuValue = document.getElementById("menuValue");
-    if (menuValue) {
+    const planButtons = document.querySelectorAll<HTMLButtonElement>(".plan-select");
+    if (menuValue || planButtons.length) {
       const WHATSAPP = "34644090462";
       const waLink = (text: string) =>
         `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
 
-      const BASE_PRICE = 50;
+      type PlanId = "admin" | "qr" | "nfc";
+      const PLANS: Record<
+        PlanId,
+        { label: string; price: number; incluyeNfc: boolean; incluyeDigitalizacion: boolean }
+      > = {
+        admin: { label: "Solo plataforma", price: 25, incluyeNfc: false, incluyeDigitalizacion: false },
+        qr: { label: "Digitalización + QR", price: 30, incluyeNfc: false, incluyeDigitalizacion: true },
+        nfc: { label: "Digitalización + NFC", price: 30, incluyeNfc: true, incluyeDigitalizacion: true },
+      };
+
+      const ENTRADA_FEE = 50;
       const MENU_TIER_THRESHOLD = 30;
       const MENU_BASE = 20;
       const MENU_DISCOUNT = 18;
@@ -80,17 +92,33 @@ export default function LandingScript() {
       const REVIEW_BASE = 30;
       const REVIEW_DISCOUNT = 25;
 
-      const state = { menu: 6, reviews: 1, maint: false };
+      const state = { plan: "qr" as PlanId, menu: 6, reviews: 1, name: "" };
 
       const reviewValue = document.getElementById("reviewValue");
       const totalAmount = document.getElementById("totalAmount");
-      const maintToggle = document.getElementById("maintToggle");
-      const maintLine = document.getElementById(
-        "maintLine",
-      ) as HTMLElement | null;
+      const totalLabel = document.getElementById("totalLabel");
+      const nfcExtras = document.getElementById("nfcExtras") as HTMLElement | null;
+      const entradaSub = document.getElementById("entradaSub") as HTMLElement | null;
+      const nfcSub = document.getElementById("nfcSub") as HTMLElement | null;
+      const nfcAmount = document.getElementById("nfcAmount");
       const calcWa = document.getElementById(
         "calc-wa",
       ) as HTMLAnchorElement | null;
+      const restoName = document.getElementById(
+        "restoName",
+      ) as HTMLInputElement | null;
+      const qrUrlEl = document.getElementById("precioQrUrl");
+      const qrCanvas = document.getElementById(
+        "precioQrCanvas",
+      ) as HTMLCanvasElement | null;
+
+      const slugify = (input: string) =>
+        input
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "");
 
       const tierPrice = (
         qty: number,
@@ -108,38 +136,62 @@ export default function LandingScript() {
         setTimeout(() => totalAmount?.classList.remove("bump"), 220);
       };
 
+      const renderQr = () => {
+        const slug = slugify(state.name) || "tu-restaurante";
+        if (qrUrlEl) qrUrlEl.textContent = `cartoca.es/${slug}`;
+        if (qrCanvas) {
+          QRCode.toCanvas(qrCanvas, `https://cartoca.es/${slug}`, {
+            width: 104,
+            margin: 1,
+            color: { dark: "#101b2d", light: "#ffffff" },
+          }).catch(() => {});
+        }
+      };
+
       const render = (animate: boolean) => {
+        const plan = PLANS[state.plan];
+
+        planButtons.forEach((btn) => {
+          const active = btn.dataset.plan === state.plan;
+          btn.classList.toggle("active", active);
+          btn.setAttribute("aria-pressed", active ? "true" : "false");
+        });
+
+        if (nfcExtras) nfcExtras.style.display = plan.incluyeNfc ? "block" : "none";
         if (menuValue) menuValue.textContent = String(state.menu);
         if (reviewValue) reviewValue.textContent = String(state.reviews);
-        maintToggle?.setAttribute(
-          "aria-pressed",
-          state.maint ? "true" : "false",
-        );
-        if (maintLine) maintLine.style.display = state.maint ? "flex" : "none";
 
-        const menuCost = tierPrice(
-          state.menu,
-          MENU_BASE,
-          MENU_DISCOUNT,
-          MENU_TIER_THRESHOLD,
-        );
-        const reviewCost = tierPrice(
-          state.reviews,
-          REVIEW_BASE,
-          REVIEW_DISCOUNT,
-          REVIEW_TIER_THRESHOLD,
-        );
-        const total = BASE_PRICE + menuCost + reviewCost;
-        if (totalAmount) totalAmount.textContent = `${total}€`;
+        if (totalLabel) totalLabel.textContent = plan.label;
+        if (totalAmount) totalAmount.textContent = `${plan.price}€/mes`;
         if (animate) bump();
 
+        const menuCost = plan.incluyeNfc
+          ? tierPrice(state.menu, MENU_BASE, MENU_DISCOUNT, MENU_TIER_THRESHOLD)
+          : 0;
+        const reviewCost = plan.incluyeNfc
+          ? tierPrice(state.reviews, REVIEW_BASE, REVIEW_DISCOUNT, REVIEW_TIER_THRESHOLD)
+          : 0;
+        const nfcTotal = menuCost + reviewCost;
+        const entrada = plan.incluyeDigitalizacion ? ENTRADA_FEE : 0;
+
+        if (entradaSub) entradaSub.style.display = entrada > 0 ? "flex" : "none";
+        if (nfcSub) nfcSub.style.display = plan.incluyeNfc && nfcTotal > 0 ? "flex" : "none";
+        if (nfcAmount) nfcAmount.textContent = `${nfcTotal}€ pago único`;
+
+        const nombre = state.name.trim() || "(sin nombre todavía)";
         const lines = [
           "Hola, quiero pedir presupuesto para mi carta digital Cartoca:",
-          `- ${state.menu} tarjeta(s) NFC de menú`,
-          `- ${state.reviews} tarjeta(s) NFC de reseñas`,
-          `- Acceso a la plataforma: ${state.maint ? "sí (desde 25€/mes, según funciones)" : "no"}`,
-          `Pago único estimado: ${total}€`,
+          `- Restaurante: ${nombre}`,
+          `- Plan: ${plan.label} (${plan.price}€/mes)`,
         ];
+        if (entrada > 0) {
+          lines.push(`- Entrada (digitalización): ${entrada}€ pago único`);
+        }
+        if (plan.incluyeNfc) {
+          lines.push(`- ${state.menu} tarjeta(s) NFC de menú`);
+          lines.push(`- ${state.reviews} tarjeta(s) NFC de reseñas de Google`);
+          lines.push(`- Tarjetas NFC: ${nfcTotal}€ pago único`);
+        }
         if (calcWa) calcWa.href = waLink(lines.join("\n"));
       };
 
@@ -149,6 +201,17 @@ export default function LandingScript() {
         el.addEventListener("click", fn);
         cleanups.push(() => el.removeEventListener("click", fn));
       };
+
+      planButtons.forEach((btn) => {
+        const handler = () => {
+          const planId = btn.dataset.plan as PlanId | undefined;
+          if (!planId || !(planId in PLANS)) return;
+          state.plan = planId;
+          render(true);
+        };
+        btn.addEventListener("click", handler);
+        cleanups.push(() => btn.removeEventListener("click", handler));
+      });
 
       bind("menuMinus", () => {
         state.menu = Math.max(0, state.menu - 1);
@@ -166,11 +229,17 @@ export default function LandingScript() {
         state.reviews = Math.min(30, state.reviews + 1);
         render(true);
       });
-      bind("maintToggle", () => {
-        state.maint = !state.maint;
-        render(true);
-      });
 
+      if (restoName) {
+        const handler = () => {
+          state.name = restoName.value;
+          renderQr();
+        };
+        restoName.addEventListener("input", handler);
+        cleanups.push(() => restoName.removeEventListener("input", handler));
+      }
+
+      renderQr();
       render(false);
     }
 
