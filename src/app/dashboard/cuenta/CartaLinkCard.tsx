@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import QrDescargable from './QrDescargable'
 
 export default function CartaLinkCard({ slug }: { slug: string }) {
   const [copiado, setCopiado] = useState(false)
@@ -21,9 +22,9 @@ export default function CartaLinkCard({ slug }: { slug: string }) {
     <div className="glass-card rounded-2xl p-5">
       <h2 className="text-sm font-semibold text-slate-900 mb-1">Enlace de tu carta</h2>
       <p className="text-sm text-slate-500 mb-3">
-        Compártelo con tus clientes o úsalo en tus tarjetas NFC.
+        Compártelo con tus clientes, imprime el QR para tus mesas, o úsalo en tus tarjetas NFC.
       </p>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 mb-4">
         <a
           href={url}
           target="_blank"
@@ -38,6 +39,9 @@ export default function CartaLinkCard({ slug }: { slug: string }) {
         >
           {copiado ? 'Copiado ✓' : 'Copiar'}
         </button>
+      </div>
+      <div className="pt-4 border-t border-black/[0.06]">
+        <QrDescargable url={url} />
       </div>
     </div>
   )
