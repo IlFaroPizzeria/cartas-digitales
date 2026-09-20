@@ -63,6 +63,17 @@ export default function QuotePresupuestoForm() {
         <input id="pais" name="pais" type="text" required placeholder="p. ej. España" />
       </div>
 
+      <div className="quote-two">
+        <div className="quote-field">
+          <label htmlFor="telefono">Teléfono de contacto</label>
+          <input id="telefono" name="telefono" type="tel" required placeholder="p. ej. 600 000 000" />
+        </div>
+        <div className="quote-field">
+          <label htmlFor="email">Email</label>
+          <input id="email" name="email" type="email" required placeholder="p. ej. tu@restaurante.com" />
+        </div>
+      </div>
+
       <div className="quote-field">
         <label id="quote-plan-label">Plan</label>
         <div className="quote-plan-group" role="radiogroup" aria-labelledby="quote-plan-label">

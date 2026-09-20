@@ -41,6 +41,8 @@ export async function enviarSolicitudPresupuesto(
   const restaurante = String(formData.get('restaurante') ?? '').trim()
   const ciudad = String(formData.get('ciudad') ?? '').trim()
   const pais = String(formData.get('pais') ?? '').trim()
+  const telefono = String(formData.get('telefono') ?? '').trim()
+  const email = String(formData.get('email') ?? '').trim()
   const planId = String(formData.get('plan') ?? 'qr') as PlanId
   const plan = PLANS[planId] ?? PLANS.qr
   const tarjetasMenu = plan.incluyeNfc ? Number(formData.get('tarjetasMenu') ?? '0') || 0 : 0
@@ -52,8 +54,8 @@ export async function enviarSolicitudPresupuesto(
   const reviewCost = tierPrice(tarjetasResenas, REVIEW_BASE, REVIEW_DISCOUNT, REVIEW_TIER_THRESHOLD)
   const nfcTotal = menuCost + reviewCost
 
-  if (!restaurante || !ciudad || !pais) {
-    return { ok: false, message: 'Rellena al menos el nombre del restaurante, la ciudad y el país.' }
+  if (!restaurante || !ciudad || !pais || !telefono || !email) {
+    return { ok: false, message: 'Rellena el nombre del restaurante, la ciudad, el país, el teléfono y el email.' }
   }
 
   const apiKey = process.env.RESEND_API_KEY
@@ -65,14 +67,22 @@ export async function enviarSolicitudPresupuesto(
     }
   }
 
+  // Email básicamente válido (comprobación ligera, no exhaustiva): si no lo
+  // parece, mandamos el correo igual pero sin reply_to, para no bloquear la
+  // solicitud por esto -- el teléfono sigue en el cuerpo como alternativa.
+  const emailParaResponder = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : undefined
+
   const body = {
     from: FROM_EMAIL,
     to: [TO_EMAIL],
+    ...(emailParaResponder ? { reply_to: emailParaResponder } : {}),
     subject: `Nueva solicitud de presupuesto — ${restaurante}`,
     text: [
       `Restaurante: ${restaurante}`,
       `Ciudad: ${ciudad}`,
       `País: ${pais}`,
+      `Teléfono: ${telefono}`,
+      `Email: ${email}`,
       `Plan: ${plan.label} (${plan.price}€/mes)`,
       ...(entrada > 0 ? [`Entrada (digitalización): ${entrada}€ pago único`] : []),
       ...(plan.incluyeNfc
