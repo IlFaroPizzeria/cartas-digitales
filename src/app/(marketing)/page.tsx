@@ -8,7 +8,7 @@ const bodyHtml = fs.readFileSync(path.join(process.cwd(), 'src/app/home-body.htm
 export const metadata: Metadata = {
   title: 'Cartoca | Cartas digitales para restaurantes',
   description:
-    'La carta aparece en cuanto tocas. Cartas digitales y reseñas de Google con tecnología NFC para bares y restaurantes. Sin apps que instalar, sin cámaras de QR.',
+    'La plataforma de cartas digitales para restaurantes: gestiónala tú mismo y compártela como quieras, con QR, enlace o tarjetas NFC.',
 }
 
 export default function HomePage() {

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Cartoca | Cartas digitales para restaurantes",
   description:
-    "Carta digital con NFC para tu restaurante: sin apps, en varios idiomas y siempre al día.",
+    "La plataforma de cartas digitales para restaurantes: actualízala tú mismo y compártela con QR, enlace o NFC.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
