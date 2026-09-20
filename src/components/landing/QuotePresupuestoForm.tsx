@@ -5,10 +5,18 @@ import { enviarSolicitudPresupuesto, type QuoteFormState } from './actions'
 
 const initialState: QuoteFormState = null
 
-// Mismos precios e importe base que la calculadora de /precios (ver
+// Mismos planes y precios que la calculadora de /precios (ver
 // src/components/landing/LandingScript.tsx) -- si cambian ahí, cambian
 // también aquí para que ambas páginas digan siempre lo mismo.
-const BASE_PRICE = 50
+type PlanId = 'admin' | 'qr' | 'nfc'
+
+const PLANS: Record<PlanId, { label: string; price: number; incluyeNfc: boolean; incluyeDigitalizacion: boolean }> = {
+  admin: { label: 'Solo plataforma', price: 25, incluyeNfc: false, incluyeDigitalizacion: false },
+  qr: { label: 'Digitalización + QR', price: 30, incluyeNfc: false, incluyeDigitalizacion: true },
+  nfc: { label: 'Digitalización + NFC', price: 30, incluyeNfc: true, incluyeDigitalizacion: true },
+}
+
+const ENTRADA_FEE = 50
 const MENU_TIER_THRESHOLD = 30
 const MENU_BASE = 20
 const MENU_DISCOUNT = 18
@@ -23,15 +31,19 @@ function tierPrice(qty: number, base: number, discounted: number, threshold: num
 
 export default function QuotePresupuestoForm() {
   const [state, formAction, pending] = useActionState(enviarSolicitudPresupuesto, initialState)
+  const [plan, setPlan] = useState<PlanId>('qr')
   const [tarjetasMenu, setTarjetasMenu] = useState(6)
   const [tarjetasResenas, setTarjetasResenas] = useState(1)
-  const [accesoPlataforma, setAccesoPlataforma] = useState(false)
 
-  const total = useMemo(() => {
+  const planInfo = PLANS[plan]
+  const entrada = planInfo.incluyeDigitalizacion ? ENTRADA_FEE : 0
+
+  const nfcTotal = useMemo(() => {
+    if (!planInfo.incluyeNfc) return 0
     const menuCost = tierPrice(tarjetasMenu, MENU_BASE, MENU_DISCOUNT, MENU_TIER_THRESHOLD)
     const reviewCost = tierPrice(tarjetasResenas, REVIEW_BASE, REVIEW_DISCOUNT, REVIEW_TIER_THRESHOLD)
-    return BASE_PRICE + menuCost + reviewCost
-  }, [tarjetasMenu, tarjetasResenas])
+    return menuCost + reviewCost
+  }, [planInfo.incluyeNfc, tarjetasMenu, tarjetasResenas])
 
   return (
     <form className="quote-form" action={formAction}>
@@ -51,74 +63,83 @@ export default function QuotePresupuestoForm() {
         <input id="pais" name="pais" type="text" required placeholder="p. ej. España" />
       </div>
 
-      <div className="quote-steppers">
-        <div className="quote-stepper-row">
-          <div>
-            <div className="qs-label">Digitalización de la carta</div>
-            <div className="qs-help">Incluido siempre, pago único</div>
-          </div>
-          <div className="qs-fixed mono">{BASE_PRICE}€</div>
-        </div>
-        <div className="quote-stepper-row">
-          <div>
-            <div className="qs-label">Tarjetas NFC de menú</div>
-            <div className="qs-help">20€/ud · 18€/ud a partir de 30</div>
-          </div>
-          <div className="stepper">
-            <button type="button" aria-label="Quitar tarjeta de menú" onClick={() => setTarjetasMenu((v) => Math.max(0, v - 1))}>
-              –
+      <div className="quote-field">
+        <label id="quote-plan-label">Plan</label>
+        <div className="quote-plan-group" role="radiogroup" aria-labelledby="quote-plan-label">
+          {(Object.keys(PLANS) as PlanId[]).map((id) => (
+            <button
+              key={id}
+              type="button"
+              className={`quote-plan-btn ${plan === id ? 'active' : ''}`}
+              role="radio"
+              aria-checked={plan === id}
+              onClick={() => setPlan(id)}
+            >
+              <span>
+                <span className="qp-name">{PLANS[id].label}</span>
+                {PLANS[id].incluyeDigitalizacion && <span className="qp-sub">+ {ENTRADA_FEE}€ de entrada, pago único</span>}
+              </span>
+              <span className="qp-price mono">{PLANS[id].price}€/mes</span>
             </button>
-            <output>{tarjetasMenu}</output>
-            <button type="button" aria-label="Añadir tarjeta de menú" onClick={() => setTarjetasMenu((v) => Math.min(80, v + 1))}>
-              +
-            </button>
-          </div>
-        </div>
-        <div className="quote-stepper-row">
-          <div>
-            <div className="qs-label">Tarjetas NFC de reseñas</div>
-            <div className="qs-help">30€/ud · 25€/ud a partir de 5</div>
-          </div>
-          <div className="stepper">
-            <button type="button" aria-label="Quitar tarjeta de reseñas" onClick={() => setTarjetasResenas((v) => Math.max(0, v - 1))}>
-              –
-            </button>
-            <output>{tarjetasResenas}</output>
-            <button type="button" aria-label="Añadir tarjeta de reseñas" onClick={() => setTarjetasResenas((v) => Math.min(30, v + 1))}>
-              +
-            </button>
-          </div>
-        </div>
-        <div className="quote-stepper-row">
-          <div>
-            <div className="qs-label">Acceso a la plataforma</div>
-            <div className="qs-help">Desde 25€/mes, según funciones</div>
-          </div>
-          <button
-            type="button"
-            className="toggle"
-            role="switch"
-            aria-pressed={accesoPlataforma}
-            aria-label="Activar acceso a la plataforma"
-            onClick={() => setAccesoPlataforma((v) => !v)}
-          />
+          ))}
         </div>
       </div>
 
-      <div className="calc-total">
-        <span className="t-label">Pago único estimado</span>
-        <span className="t-amount mono">{total}€</span>
-      </div>
-      {accesoPlataforma && (
-        <div className="calc-sub">
-          <span>+ Acceso a la plataforma</span>
-          <span className="mono">desde 25€/mes</span>
+      {planInfo.incluyeNfc && (
+        <div className="quote-steppers">
+          <div className="quote-stepper-row">
+            <div>
+              <div className="qs-label">Tarjetas NFC de menú</div>
+              <div className="qs-help">20€/ud · 18€/ud a partir de 30</div>
+            </div>
+            <div className="stepper">
+              <button type="button" aria-label="Quitar tarjeta de menú" onClick={() => setTarjetasMenu((v) => Math.max(0, v - 1))}>
+                –
+              </button>
+              <output>{tarjetasMenu}</output>
+              <button type="button" aria-label="Añadir tarjeta de menú" onClick={() => setTarjetasMenu((v) => Math.min(80, v + 1))}>
+                +
+              </button>
+            </div>
+          </div>
+          <div className="quote-stepper-row">
+            <div>
+              <div className="qs-label">Tarjetas NFC de reseñas de Google</div>
+              <div className="qs-help">30€/ud · 25€/ud a partir de 5</div>
+            </div>
+            <div className="stepper">
+              <button type="button" aria-label="Quitar tarjeta de reseñas" onClick={() => setTarjetasResenas((v) => Math.max(0, v - 1))}>
+                –
+              </button>
+              <output>{tarjetasResenas}</output>
+              <button type="button" aria-label="Añadir tarjeta de reseñas" onClick={() => setTarjetasResenas((v) => Math.min(30, v + 1))}>
+                +
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
-      <input type="hidden" name="tarjetasMenu" value={tarjetasMenu} />
-      <input type="hidden" name="tarjetasResenas" value={tarjetasResenas} />
-      {accesoPlataforma && <input type="hidden" name="accesoPlataforma" value="on" />}
+      <div className="calc-total">
+        <span className="t-label">{planInfo.label}</span>
+        <span className="t-amount mono">{planInfo.price}€/mes</span>
+      </div>
+      {entrada > 0 && (
+        <div className="calc-sub">
+          <span>+ Entrada (digitalización)</span>
+          <span className="mono">{entrada}€ pago único</span>
+        </div>
+      )}
+      {planInfo.incluyeNfc && nfcTotal > 0 && (
+        <div className="calc-sub">
+          <span>+ Tarjetas NFC</span>
+          <span className="mono">{nfcTotal}€ pago único</span>
+        </div>
+      )}
+
+      <input type="hidden" name="plan" value={plan} />
+      <input type="hidden" name="tarjetasMenu" value={planInfo.incluyeNfc ? tarjetasMenu : 0} />
+      <input type="hidden" name="tarjetasResenas" value={planInfo.incluyeNfc ? tarjetasResenas : 0} />
 
       <div className="quote-field">
         <label htmlFor="mensaje">Mensaje (opcional)</label>

@@ -516,6 +516,13 @@
   .landing .quote-stepper-row .qs-label{font-size:13.5px;font-weight:700;}
   .landing .quote-stepper-row .qs-help{font-size:11.5px;color:var(--ink-faint);margin-top:2px;}
   .landing .quote-stepper-row .qs-fixed{font-size:15px;font-weight:600;}
+  .landing .quote-plan-group{display:flex;flex-direction:column;gap:8px;}
+  .landing .quote-plan-btn{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1.5px solid var(--line-strong);border-radius:12px;background:var(--surface);cursor:pointer;text-align:left;transition:border-color .15s var(--ease),background .15s var(--ease);}
+  .landing .quote-plan-btn:hover{border-color:var(--accent);}
+  .landing .quote-plan-btn.active{border-color:var(--accent);background:var(--accent-soft);}
+  .landing .quote-plan-btn .qp-name{font-size:13.5px;font-weight:700;display:block;}
+  .landing .quote-plan-btn .qp-sub{font-size:11px;color:var(--ink-faint);display:block;margin-top:2px;}
+  .landing .quote-plan-btn .qp-price{font-size:14px;font-weight:600;white-space:nowrap;flex:none;}
   .landing .quote-msg{font-size:13px;font-weight:600;padding:11px 13px;border-radius:10px;}
   .landing .quote-msg.ok{background:var(--accent-soft);color:var(--accent-dark);}
   .landing .quote-msg.err{background:rgba(165,67,47,0.1);color:var(--danger);}

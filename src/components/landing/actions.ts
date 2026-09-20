@@ -9,11 +9,19 @@ const FROM_EMAIL = 'Cartoca <hola@cartoca.es>'
 
 export type QuoteFormState = { ok: boolean; message: string } | null
 
-// Mismos precios que la calculadora de /precios y el formulario (ver
-// src/components/landing/LandingScript.tsx y QuotePresupuestoForm.tsx) --
-// se recalculan aquí, en el servidor, en vez de fiarse de un total que
+// Mismos planes y precios que la calculadora de /precios y el formulario
+// (ver src/components/landing/LandingScript.tsx y QuotePresupuestoForm.tsx)
+// -- se recalculan aquí, en el servidor, en vez de fiarse de un total que
 // mande el navegador.
-const BASE_PRICE = 50
+type PlanId = 'admin' | 'qr' | 'nfc'
+
+const PLANS: Record<PlanId, { label: string; price: number; incluyeNfc: boolean; incluyeDigitalizacion: boolean }> = {
+  admin: { label: 'Solo plataforma', price: 25, incluyeNfc: false, incluyeDigitalizacion: false },
+  qr: { label: 'Digitalización + QR', price: 30, incluyeNfc: false, incluyeDigitalizacion: true },
+  nfc: { label: 'Digitalización + NFC', price: 30, incluyeNfc: true, incluyeDigitalizacion: true },
+}
+
+const ENTRADA_FEE = 50
 const MENU_TIER_THRESHOLD = 30
 const MENU_BASE = 20
 const MENU_DISCOUNT = 18
@@ -33,14 +41,16 @@ export async function enviarSolicitudPresupuesto(
   const restaurante = String(formData.get('restaurante') ?? '').trim()
   const ciudad = String(formData.get('ciudad') ?? '').trim()
   const pais = String(formData.get('pais') ?? '').trim()
-  const tarjetasMenu = Number(formData.get('tarjetasMenu') ?? '0') || 0
-  const tarjetasResenas = Number(formData.get('tarjetasResenas') ?? '0') || 0
-  const accesoPlataforma = formData.get('accesoPlataforma') === 'on' ? 'Sí' : 'No'
+  const planId = String(formData.get('plan') ?? 'qr') as PlanId
+  const plan = PLANS[planId] ?? PLANS.qr
+  const tarjetasMenu = plan.incluyeNfc ? Number(formData.get('tarjetasMenu') ?? '0') || 0 : 0
+  const tarjetasResenas = plan.incluyeNfc ? Number(formData.get('tarjetasResenas') ?? '0') || 0 : 0
   const mensaje = String(formData.get('mensaje') ?? '').trim()
 
+  const entrada = plan.incluyeDigitalizacion ? ENTRADA_FEE : 0
   const menuCost = tierPrice(tarjetasMenu, MENU_BASE, MENU_DISCOUNT, MENU_TIER_THRESHOLD)
   const reviewCost = tierPrice(tarjetasResenas, REVIEW_BASE, REVIEW_DISCOUNT, REVIEW_TIER_THRESHOLD)
-  const totalEstimado = BASE_PRICE + menuCost + reviewCost
+  const nfcTotal = menuCost + reviewCost
 
   if (!restaurante || !ciudad || !pais) {
     return { ok: false, message: 'Rellena al menos el nombre del restaurante, la ciudad y el país.' }
@@ -63,11 +73,15 @@ export async function enviarSolicitudPresupuesto(
       `Restaurante: ${restaurante}`,
       `Ciudad: ${ciudad}`,
       `País: ${pais}`,
-      `Digitalización de la carta: ${BASE_PRICE}€ (incluido siempre)`,
-      `Tarjetas NFC de menú: ${tarjetasMenu}`,
-      `Tarjetas NFC de reseñas: ${tarjetasResenas}`,
-      `Acceso a la plataforma: ${accesoPlataforma}`,
-      `Pago único estimado: ${totalEstimado}€`,
+      `Plan: ${plan.label} (${plan.price}€/mes)`,
+      ...(entrada > 0 ? [`Entrada (digitalización): ${entrada}€ pago único`] : []),
+      ...(plan.incluyeNfc
+        ? [
+            `Tarjetas NFC de menú: ${tarjetasMenu}`,
+            `Tarjetas NFC de reseñas de Google: ${tarjetasResenas}`,
+            `Tarjetas NFC: ${nfcTotal}€ pago único`,
+          ]
+        : []),
       '',
       'Mensaje:',
       mensaje || '(sin mensaje)',
